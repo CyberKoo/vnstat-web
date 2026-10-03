@@ -1,0 +1,6 @@
+/* ══════════════════════════════════════════════════
+   Shared custom media query definitions
+   Used by global CSS and Vue SFC scoped styles via postcss-custom-media.
+   ══════════════════════════════════════════════════ */
+@custom-media --mobile (max-width: 1023px);
+@custom-media --desktop (min-width: 1024px);

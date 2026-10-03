@@ -1,0 +1,1396 @@
+/* ══════════════════════════════════════════════════
+   S2 Design System — Glass (Modern Observability)
+   ══════════════════════════════════════════════════ */
+
+/* ── Light theme tokens ── */
+:root {
+    --font-sans:
+        'Inter', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    /* ── Surfaces ── */
+    --s2-bg: #eef1f7;
+    --s2-card: #ffffff;
+    /* Page backdrop painted by the layout shell. Kept transparent so the aurora layer below
+       (body::before) stays visible: Liquid Glass needs colorful content behind the glass for
+       the blur and the specular edge to read at all. */
+    --s2-layout-backdrop: transparent;
+    --s2-border: #d8dce8;
+    --s2-border-light: #eff1f6;
+    /* Progress-bar track: a translucent text tint that stays visible on the glass card in both
+       themes (the --s2-border-light track used before disappeared into the surface at ~1.1:1).
+       Resolves per-theme through --s2-text, so no dark override is needed. */
+    --s2-track: color-mix(in srgb, var(--s2-text) 15%, transparent);
+    --s2-text: #1c2333;
+    --s2-text-muted: #646c82;
+    --s2-shadow: 0 2px 6px rgba(16, 24, 40, 0.04), 0 12px 32px rgba(16, 24, 40, 0.08);
+    --s2-shadow-lg: 0 12px 40px rgba(16, 24, 40, 0.1);
+    --s2-hover-bg: rgba(28, 35, 51, 0.04);
+    /* Header/menu button resting surface and its hover step; previously the token did not exist
+       and the component fell back to a fixed dark tint with no visible hover feedback in dark mode */
+    --s2-btn-surface: rgba(28, 35, 51, 0.05);
+    --s2-btn-surface-hover: rgba(28, 35, 51, 0.09);
+
+    /* ── Glass surfaces ──
+       Liquid Glass material: translucent fill, blur + saturation, and a specular edge
+       (--s2-glass-edge: bright top rim, faint dark bottom rim) applied through box-shadow. */
+    --s2-glass-bg: rgba(255, 255, 255, 0.48);
+    --s2-glass-bg-strong: rgba(255, 255, 255, 0.62);
+    --s2-glass-border: rgba(255, 255, 255, 0.7);
+    --s2-glass-blur: 28px;
+    --s2-glass-saturate: 180%;
+    --s2-glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(16, 24, 40, 0.05);
+
+    /* ── Mobile drawer dimming ──
+       No positioned element (fixed/absolute/pseudo) can paint into the underscan strip
+       behind iOS 26 Safari's expanded chrome — only the document paints there. So the
+       drawer dims the page content itself with this filter (see .s2-dimmed), which
+       covers every region uniformly instead of adding a scrim layer. */
+    --s2-drawer-dim: blur(4px) brightness(0.94) saturate(0.88);
+
+    /* ── Aurora background ── */
+    --s2-aurora-1: rgba(76, 111, 255, 0.2);
+    --s2-aurora-2: rgba(12, 148, 80, 0.13);
+    --s2-aurora-3: rgba(180, 105, 0, 0.1);
+    --s2-aurora-4: rgba(139, 92, 246, 0.12);
+
+    /* ── Data colors (theme-invariant, mirror of config/colors.ts palette) ── */
+    --brand: #7c5cff;
+    --brand-bg: rgba(124, 92, 255, 0.1);
+    --brand-soft: rgba(124, 92, 255, 0.06);
+    --rx: #4c6fff;
+    --tx: #0c9450;
+    --accent: #b46900;
+    --danger: #f04438;
+    --purple: #8b5cf6;
+    --cyan: #06b6d4;
+    --pink: #ec4899;
+
+    /* ── Canvas-rendered chart colors ──
+       Chart.js paints on a <canvas>, so it cannot read the cascade. These tokens are the
+       bridge: useChartTheme() samples them off <html> and hands the values to Chart.js.
+       Values are the historical ones this app rendered with, kept verbatim so the charts
+       do not shift when the theme source moves off the UI library. */
+    --s2-chart-text: #000000;
+    --s2-chart-grid: rgb(194, 194, 194);
+    --s2-chart-surface: #ffffff;
+
+    /* ── Navigation (sidebar menu + breadcrumb) ──
+       Kept as its own ramp rather than reusing --s2-text: the nav sits on the glass sider, where a
+       lighter label keeps the item text from competing with the data readouts next to it. */
+    --s2-nav-text: #333639;
+    --s2-nav-icon: #1f2225;
+    --s2-nav-text-dim: #6b7280;
+    --s2-nav-active-bg: rgba(124, 92, 255, 0.1);
+    /* Active menu text sits on the 10% brand pill, where --brand itself only reaches ~3.6:1;
+       palette.brandPressed keeps the brand family and clears ~4.6:1 */
+    --s2-nav-active-text: #6a4ae8;
+    --s2-nav-hover-bg: rgb(243, 243, 245);
+    /* 1px hairline on the rail's trailing edge. Drawn as an inset shadow so it never
+       eats into the 192px/56px width budget the menu grid is laid out against. */
+    --s2-divider: #efeff5;
+    /* ── Popover (dropdown panels) ── */
+    --s2-popover: #ffffff;
+    --s2-popover-text: #333639;
+    --s2-popover-shadow:
+        0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+
+    /* ── Tooltip ──
+       Its own surface, not the popover fill: the collapsed-rail label bubble is a dark chip in
+       light mode and only converges on the popover surface in dark. */
+    --s2-tooltip: #262626;
+    --s2-tooltip-text: #ffffff;
+    --s2-tooltip-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+
+    /* ── Shape & motion ── */
+    --s2-radius: 16px;
+    --s2-radius-sm: 10px;
+    --s2-radius-xs: 6px;
+    /* Page-level sheet container; drops to 18px under the --mobile media query */
+    --s2-radius-lg: 20px;
+    --s2-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --s2-reveal-transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* ── Layout ── */
+    --header-height: 60px;
+    --footer-height: 48px;
+    --std-gap: 12px;
+    --gap-xl: 24px;
+}
+
+/* ── Dark theme tokens ── */
+:root.dark {
+    --s2-bg: #0b0e15;
+    --s2-card: #151926;
+    --s2-layout-backdrop: transparent;
+    --s2-border: #242b3f;
+    --s2-border-light: #1d2334;
+    --s2-text: #e8ebf4;
+    --s2-text-muted: #8b93a9;
+    /* Dark glass floats as well: a soft deep shadow replaces the former flat "none" */
+    --s2-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.35);
+    --s2-shadow-lg: 0 16px 44px rgba(0, 0, 0, 0.5);
+    --s2-hover-bg: rgba(232, 235, 244, 0.06);
+    --s2-btn-surface: rgba(232, 235, 244, 0.06);
+    --s2-btn-surface-hover: rgba(232, 235, 244, 0.12);
+
+    --s2-glass-bg: rgba(21, 26, 40, 0.4);
+    --s2-glass-bg-strong: rgba(21, 26, 40, 0.6);
+    --s2-glass-border: rgba(255, 255, 255, 0.13);
+    --s2-glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+
+    --s2-drawer-dim: blur(4px) brightness(0.72) saturate(0.9);
+
+    /* Aurora runs brighter in dark mode so the more translucent glass has color to refract */
+    --s2-aurora-1: rgba(76, 111, 255, 0.2);
+    --s2-aurora-2: rgba(12, 148, 80, 0.14);
+    --s2-aurora-3: rgba(180, 105, 0, 0.12);
+    --s2-aurora-4: rgba(139, 92, 246, 0.16);
+
+    --s2-chart-text: #ffffff;
+    --s2-chart-grid: rgba(255, 255, 255, 0.38);
+    --s2-chart-surface: rgb(72, 72, 78);
+
+    --s2-nav-text: rgba(255, 255, 255, 0.82);
+    --s2-nav-icon: rgba(255, 255, 255, 0.9);
+    --s2-nav-text-dim: rgba(255, 255, 255, 0.52);
+    /* The active pill sits on dark glass or the popover surface, where 0.15 washed out */
+    --s2-nav-active-bg: rgba(124, 92, 255, 0.26);
+    /* Brand purple text is only ~2:1 on the popover surface; the hover step keeps it readable */
+    --s2-nav-active-text: #9178ff;
+    --s2-nav-hover-bg: rgba(255, 255, 255, 0.09);
+    --s2-divider: rgba(255, 255, 255, 0.09);
+    /* Popovers converge on the dark ramp (#242b3f = --s2-border): the naive gray this used to
+       mirror made brand-tinted rows unreadable and floated too far off the dark glass */
+    --s2-popover: #242b3f;
+    --s2-popover-text: rgba(255, 255, 255, 0.82);
+    --s2-popover-shadow:
+        0 3px 6px -4px rgba(0, 0, 0, 0.24), 0 6px 12px 0 rgba(0, 0, 0, 0.16), 0 9px 18px 8px rgba(0, 0, 0, 0.1);
+    --s2-tooltip: #242b3f;
+    --s2-tooltip-text: rgba(255, 255, 255, 0.82);
+    --s2-tooltip-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.24), 0 6px 12px 0 rgba(0, 0, 0, 0.16);
+}
+
+/* ── Global base ── */
+html {
+    overflow-y: auto;
+    background-color: var(--s2-bg);
+    transition: background-color var(--s2-transition);
+}
+
+body {
+    font-family: var(--font-sans);
+    /* Base text colour. Anything that does not declare its own inherits this, so it has to be
+       set here rather than left to the UA default — otherwise a themed page silently mixes
+       hard-coded black/white into its palette. */
+    color: var(--s2-text);
+    background-color: var(--s2-bg);
+    min-height: 100%;
+    transition:
+        color var(--s2-transition),
+        background-color var(--s2-transition);
+}
+
+/* Aurora ambient background — glass cards read "glass" against this layer */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(56vw 40vh at 12% 0%, var(--s2-aurora-1), transparent 70%),
+        radial-gradient(48vw 36vh at 88% 12%, var(--s2-aurora-2), transparent 70%),
+        radial-gradient(60vw 44vh at 50% 108%, var(--s2-aurora-3), transparent 70%),
+        radial-gradient(42vw 38vh at 88% 88%, var(--s2-aurora-4), transparent 70%);
+}
+
+#app {
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+    min-width: 360px;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+/* Set by BaseLayout on the layout shell and header while the mobile drawer is open.
+   Dimming the content itself (rather than an overlay) is the only thing that also
+   covers the underscan strip behind iOS 26 Safari's expanded chrome. */
+.s2-dimmed {
+    filter: var(--s2-drawer-dim);
+}
+
+.mono {
+    font-family: var(--font-mono) !important;
+}
+
+/* (The mobile drawer no longer locks document scroll: overflow:hidden on <html> stops iOS 26
+   Safari from compositing live page pixels behind its chrome and turned the address bar into
+   an opaque mask. The drawer overlay is transient and closes on scrim tap, so the page may
+   keep its normal scroll.) */
+
+/* ── Glass card ── */
+.s2-card {
+    background: var(--s2-glass-bg) !important;
+    backdrop-filter: blur(var(--s2-glass-blur)) saturate(var(--s2-glass-saturate));
+    -webkit-backdrop-filter: blur(var(--s2-glass-blur)) saturate(var(--s2-glass-saturate));
+    border: 1px solid var(--s2-glass-border) !important;
+    border-radius: var(--s2-radius) !important;
+    box-shadow: var(--s2-shadow), var(--s2-glass-edge);
+    transition:
+        background var(--s2-transition),
+        border-color var(--s2-transition),
+        box-shadow var(--s2-transition);
+}
+
+/* Fallback to solid cards when backdrop-filter is unsupported */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .s2-card {
+        background: var(--s2-card) !important;
+        border-color: var(--s2-border) !important;
+    }
+}
+
+/* ── Skeleton loading placeholder — shimmer sweep ──
+   The base class only defines the fill, border radius and shimmer animation; sizing is left to the context class at each usage site. */
+.s2-skeleton {
+    background: linear-gradient(100deg, var(--s2-border-light) 30%, var(--s2-card) 50%, var(--s2-border-light) 70%);
+    background-size: 200% 100%;
+    border-radius: var(--s2-radius-xs);
+    animation: s2-skeleton-shimmer 1.8s ease-in-out infinite;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Bordered variant: keeps the shape consistent when replacing bordered controls such as select */
+.s2-skeleton--bordered {
+    border: 1px solid var(--s2-border);
+}
+
+@keyframes s2-skeleton-shimmer {
+    from {
+        background-position: 150% 0;
+    }
+    to {
+        background-position: -50% 0;
+    }
+}
+
+/* ── Sheet: unified glass panel (page-level container) ── */
+.s2-sheet {
+    background: var(--s2-glass-bg);
+    backdrop-filter: blur(var(--s2-glass-blur)) saturate(var(--s2-glass-saturate));
+    -webkit-backdrop-filter: blur(var(--s2-glass-blur)) saturate(var(--s2-glass-saturate));
+    border: 1px solid var(--s2-glass-border);
+    border-radius: var(--s2-radius-lg);
+    box-shadow: var(--s2-shadow-lg), var(--s2-glass-edge);
+    transition:
+        background var(--s2-transition),
+        border-color var(--s2-transition),
+        box-shadow var(--s2-transition);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .s2-sheet {
+        background: var(--s2-card);
+        border-color: var(--s2-border);
+    }
+}
+
+/* Sheet inner sections: divided by hairlines, replacing standalone cards */
+.s2-sheet-section {
+    padding: 24px 28px;
+}
+
+.s2-sheet-section + .s2-sheet-section {
+    border-top: 1px solid var(--s2-border);
+    transition: border-color var(--s2-transition);
+}
+
+/* Section label: uppercase small text + extended hairline */
+.s2-section-label {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--s2-text-muted);
+    /* h2 carries a UA block-start margin; pin it to 0 so the tag swap changes nothing visually */
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.s2-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--s2-border);
+    transition: background-color var(--s2-transition);
+}
+
+.s2-section-label .s2-section-hint {
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+}
+
+/* ── Section label with actions: hairline sits between the title and the actions, which always hug the right edge ── */
+.s2-section-label--with-actions {
+    align-items: center;
+    flex-wrap: wrap;
+    row-gap: 8px;
+}
+
+.s2-section-label--with-actions::after {
+    order: 1;
+}
+
+.s2-section-label--with-actions .s2-export-btn {
+    order: 2;
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+.s2-section-label--with-actions .s2-chart-mode-toggle {
+    order: 3;
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+/* A --with-actions row may carry its heading as a child so controls stay siblings of the heading
+   (controls must not sit inside heading text). The heading takes the row's label typography —
+   UA heading styles would otherwise win — and draws no hairline of its own. */
+.s2-section-label--with-actions > :where(h1, h2, h3, h4, h5, h6) {
+    margin: 0;
+    font: inherit;
+}
+
+/* ── Metric band: open layout + vertical hairline dividers (replaces the stat card grid) ── */
+.s2-metric-band {
+    display: flex;
+    align-items: stretch;
+}
+
+.s2-metric {
+    flex: 1;
+    min-width: 0;
+    padding: 0 28px;
+    border-left: 1px solid var(--s2-border);
+    box-sizing: border-box;
+    transition: border-color var(--s2-transition);
+}
+
+.s2-metric:first-child {
+    padding-left: 0;
+    border-left: none;
+}
+
+/* ── Chart container (frameless, lives inside the sheet) ── */
+.s2-chart-box {
+    flex: 1;
+    min-width: 0;
+    /* Anchors .s2-chart-connecting over the plot area */
+    position: relative;
+}
+
+/* Live chart "connecting" hint: overlays the empty plot until the first SSE frame lands.
+   pointer-events: none — the plot under it (and its tooltips) stay interactive. */
+.s2-chart-connecting {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--s2-text-muted);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+}
+
+/* ── Chart panel sidebar: open column, hairline divider on the left ── */
+.s2-sidebar-glass {
+    padding: 0 0 0 20px;
+    border-left: 1px solid var(--s2-border);
+    min-width: 0;
+    transition: border-color var(--s2-transition);
+}
+
+.s2-stat-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(18px, 1.8vw, 28px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+/* ── s2-stat-value color modifiers ── */
+.s2-stat-value--rx {
+    color: var(--rx);
+}
+.s2-stat-value--tx {
+    color: var(--tx);
+}
+.s2-stat-value--accent {
+    color: var(--accent);
+}
+.s2-stat-value--brand {
+    color: var(--brand);
+}
+
+.s2-stat-label {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--s2-text-muted);
+    font-weight: 400;
+    margin-top: 2px;
+}
+
+.s2-stat-sub {
+    font-size: 12px;
+    color: var(--s2-text-muted);
+}
+
+/* Rendered on the stat-label sub span (TrafficStatsHeader): a short value
+   must never wrap away from its unit ("4.73 / GiB"). */
+.s2-nowrap {
+    white-space: nowrap;
+}
+
+/* ── Data table ── */
+.s2-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.s2-table th {
+    text-align: left;
+    padding: 8px 4px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--s2-text-muted);
+    border-bottom: 1px solid var(--s2-border);
+    font-family: var(--font-sans);
+    transition: border-color var(--s2-transition);
+}
+
+.s2-table td {
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--s2-border-light);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    transition: border-color var(--s2-transition);
+}
+
+/* Row header cells: the generic .s2-table th rule above styles every th as a column header,
+   so scope="row" headers reset to the plain body-cell look they had as td */
+.s2-table th[scope='row'] {
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--s2-border-light);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    font-weight: normal;
+    letter-spacing: normal;
+    text-transform: none;
+    color: inherit;
+    transition: border-color var(--s2-transition);
+}
+
+.s2-table tr:last-child td,
+.s2-table tr:last-child th[scope='row'] {
+    border-bottom: none;
+}
+
+/* ── Chart area ── */
+.s2-chart-area {
+    display: flex;
+    gap: 16px;
+    margin: 16px 0;
+    min-width: 0;
+}
+
+/* ── Ring chart (doughnut + center overlay) ── */
+.s2-ring-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── s2-ring-wrap height modifiers ── */
+.s2-ring-wrap--sm {
+    height: 140px;
+}
+.s2-ring-wrap--lg {
+    height: 160px;
+}
+
+.s2-ring-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.s2-ring-center-val {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--s2-text);
+}
+
+.s2-ring-center-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--s2-text-muted);
+}
+
+.s2-sidebar-fixed {
+    width: 300px;
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.s2-sidebar-glass canvas {
+    position: relative;
+    z-index: 2;
+}
+
+/* ── S2 date split row ── */
+.s2-date-split th {
+    padding: 16px 4px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--s2-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: none;
+    font-family: var(--font-sans);
+}
+.s2-date-split:not(:first-child) th {
+    padding-top: 24px;
+    border-top: 1px solid var(--s2-border);
+    transition: border-color var(--s2-transition);
+}
+
+/* ── Sidebar items (shared by all traffic pages) ── */
+.s2-sidebar-item {
+    margin-bottom: 12px;
+}
+.s2-sidebar-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--s2-text-muted);
+    margin-bottom: 8px;
+}
+.s2-sidebar-divider {
+    height: 1px;
+    background: var(--s2-border);
+    margin: 10px 0;
+    transition: background-color var(--s2-transition);
+}
+.s2-sidebar-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.s2-sidebar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.s2-sidebar-row-label {
+    font-size: 12px;
+    color: var(--s2-text-muted);
+}
+
+/* ── Data table scroll container ── */
+.s2-table-scroll {
+    overflow-x: auto;
+    padding: 0 16px 12px;
+}
+.s2-table-scroll--dense {
+    padding: 12px 16px;
+}
+
+/* ── Sidebar / drawer interface selector (shared by LayoutSider and MobileDrawer, no hairline at the bottom) ── */
+.s2-drawer-select-row {
+    padding: 8px 16px 12px;
+}
+
+/* Multi-interface dropdown (interactive: border + brand color on hover) */
+.s2-sidebar-select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--s2-border, #d8dce8);
+    border-radius: var(--s2-radius-sm, 10px);
+    background: transparent;
+    color: var(--s2-text, #1c2333);
+    font-size: 13px;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    cursor: pointer;
+    outline: none;
+    transition: border-color var(--s2-transition, 0.3s cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.s2-sidebar-select:hover {
+    border-color: var(--brand, #7c5cff);
+}
+
+/* Single-interface static identity row (no interactive styling, echoes the select shape) */
+.s2-sidebar-iface-single {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: var(--s2-radius-sm, 10px);
+    background: var(--s2-hover-bg, rgba(28, 35, 51, 0.04));
+    color: var(--s2-text-muted, #646c82);
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 13px;
+    transition: background-color var(--s2-transition, 0.3s cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.s2-sidebar-iface-single > span {
+    color: var(--s2-text, #1c2333);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Mono value emphasis ── */
+.s2-mono-strong {
+    font-weight: 500;
+}
+
+/* ── s2-stat-value size modifiers ── */
+.s2-stat-value--md {
+    font-size: 16px;
+}
+
+/* ── Interface alias ── */
+.s2-iface-alias {
+    margin-left: 8px;
+}
+
+/* ── Export button ── */
+.s2-export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border: 1px solid var(--s2-border);
+    border-radius: var(--s2-radius-xs);
+    background: transparent;
+    color: var(--s2-text-muted);
+    font-size: 12px;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: all var(--s2-transition);
+}
+.s2-export-btn:hover:not(:disabled) {
+    border-color: var(--brand);
+    color: var(--brand);
+    background: var(--s2-hover-bg);
+}
+
+/* ── Shared control states: one focus ring + one disabled treatment for every S2 control
+   (hover stays per control family; the ring matches the former .s2-sider-edge-handle rule) ── */
+.s2-header-btn:focus-visible,
+.s2-export-btn:focus-visible,
+.s2-drill-btn:focus-visible,
+.s2-quota-clear:focus-visible,
+.s2-thr-clear:focus-visible,
+.s2-replay-exit:focus-visible,
+.s2-tool-btn:focus-visible,
+.s2-iface-icon-btn:focus-visible,
+.s2-sidebar-select:focus-visible,
+.s2-seg-btn:focus-visible,
+.s2-sider-edge-handle:focus-visible,
+.s2-menu-row:focus-visible,
+.s2-breadcrumb-link:focus-visible,
+.s2-btn:focus-visible,
+.s2-quota-input:focus-visible,
+.s2-thr-input:focus-visible,
+.s2-mobile-menu-btn:focus-visible,
+.s2-app-logo:focus-visible,
+.s2-dropdown-item:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+.s2-header-btn:disabled,
+.s2-export-btn:disabled,
+.s2-drill-btn:disabled,
+.s2-quota-clear:disabled,
+.s2-thr-clear:disabled,
+.s2-replay-exit:disabled,
+.s2-tool-btn:disabled,
+.s2-iface-icon-btn:disabled,
+.s2-sidebar-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Screen-reader-only text (page h1, the "#" rank column header): present in the accessibility
+   tree, painted nowhere */
+.s2-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ── Sidebar menu ──
+   Shared by the desktop sider and the mobile drawer. Geometry (38px item, 6px gap, 16px indent)
+   and the pill inset are the values this menu has always rendered with, so the switch away from
+   a component library is a pure implementation change. */
+.s2-menu {
+    margin: 0;
+    padding: 0 0 6px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.75;
+    list-style: none;
+    /* Left inset of every row. The drawer sets a wider one, which is why this is a variable
+       rather than a constant: the pill is positioned from the row edge, not from the padding. */
+    --s2-menu-pad-left: 16px;
+}
+
+.s2-menu-item {
+    margin-top: 6px;
+}
+
+.s2-menu-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: center;
+    width: 100%;
+    height: 38px;
+    padding: 0 18px 0 var(--s2-menu-pad-left, 16px);
+    box-sizing: border-box;
+    border: none;
+    border-radius: var(--s2-radius-sm);
+    background: transparent;
+    color: var(--s2-nav-text);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    /* Buttons do not reliably inherit the parent line-height; pinning it keeps the label on the
+       same baseline grid the rest of the rail has always used (22.75px at 13px). */
+    line-height: 1.75;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        color var(--s2-transition),
+        background-color var(--s2-transition);
+}
+
+/* Selected pill: inset from both edges so it reads as a floating chip on the glass sider */
+.s2-menu-row::before {
+    content: '';
+    position: absolute;
+    inset: 0 8px;
+    border-radius: var(--s2-radius-sm);
+    background: transparent;
+    transition: background-color var(--s2-transition);
+    pointer-events: none;
+}
+
+.s2-menu-row:hover::before {
+    background: var(--s2-nav-hover-bg);
+}
+
+.s2-menu-row--active::before,
+.s2-menu-row--active:hover::before {
+    background: var(--s2-nav-active-bg);
+}
+
+.s2-menu-row--active {
+    color: var(--s2-nav-active-text);
+}
+
+/* A group that contains the current route is tinted like the active row, but the pill stays with
+   the row you are actually on — that is what the previous navigation drew. */
+.s2-menu-row--group-active,
+.s2-menu-row--group-active:hover {
+    color: var(--s2-nav-active-text);
+}
+
+/* Icon box: 24px wide with an 8px gap, which together fill the 32px grid column.
+   The glyph itself is centred in that box.
+   position:relative keeps the glyph above the ::before pill — an absolutely positioned
+   pseudo-element paints over static in-flow content, so without this the hover background
+   would cover the label. */
+.s2-menu-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    margin-right: 8px;
+    color: var(--s2-nav-icon);
+    font-size: 20px;
+    transition: color var(--s2-transition);
+}
+
+.s2-menu-row--active .s2-menu-icon,
+.s2-menu-row--group-active .s2-menu-icon {
+    color: var(--s2-nav-active-text);
+}
+
+.s2-menu-label {
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.s2-menu-arrow {
+    position: relative;
+    display: flex;
+    align-items: center;
+    color: var(--s2-nav-text-dim);
+    font-size: 20px;
+    transition:
+        transform var(--s2-transition),
+        color var(--s2-transition);
+}
+
+.s2-menu-row--active .s2-menu-arrow,
+.s2-menu-row--group-active .s2-menu-arrow {
+    color: var(--s2-nav-active-text);
+}
+
+.s2-menu-arrow--open {
+    transform: rotate(180deg);
+}
+
+/* Child level: one indent step deeper than its parent (the step is set per menu instance) */
+.s2-menu-row--child {
+    padding-left: calc(var(--s2-menu-pad-left, 16px) + var(--s2-menu-indent, 16px));
+}
+
+/* Collapsed sider: icon only, centred in the 56px rail */
+.s2-menu--collapsed .s2-menu-label,
+.s2-menu--collapsed .s2-menu-arrow {
+    display: none;
+}
+
+.s2-menu--collapsed .s2-menu-row {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0;
+    justify-items: center;
+}
+
+.s2-menu--collapsed .s2-menu-icon {
+    /* Drop the box metrics so the larger glyph centres in the 56px rail on its own */
+    width: auto;
+    margin-right: 0;
+    justify-content: center;
+    font-size: 24px;
+}
+
+/* focus ring comes from the shared control-state rules in theme-s2.css */
+
+/* Height animation for a group: the grid row goes 0fr -> 1fr, which needs exactly one child
+   (the nested <ul>) to size against. */
+.s2-menu-sub {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--s2-transition);
+}
+
+.s2-menu-sub--open {
+    grid-template-rows: 1fr;
+}
+
+.s2-menu-sub-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    /* Collapsing a grid row needs the child to opt out of its content-based minimum height */
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* ── Breadcrumb ── */
+.s2-breadcrumb-list {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.s2-breadcrumb {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.25;
+    color: var(--s2-nav-text-dim);
+}
+
+.s2-breadcrumb-item {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+/* Parent levels stay whole; the current level absorbs any shortage and truncates, so a long
+   crumb cannot push the header actions off screen. (overflow:hidden also zeroes the link's
+   flex minimum, which is what lets it shrink below its content width.) */
+.s2-breadcrumb-item:not(:last-child) {
+    flex-shrink: 0;
+}
+
+.s2-breadcrumb-item:last-child .s2-breadcrumb-link {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.s2-breadcrumb-link {
+    display: block;
+    padding: 4px;
+    border-radius: var(--s2-radius-sm);
+    color: var(--s2-nav-text-dim);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: default;
+    transition:
+        color var(--s2-transition),
+        background-color var(--s2-transition);
+}
+
+.s2-breadcrumb-link--clickable {
+    cursor: pointer;
+}
+
+.s2-breadcrumb-link--clickable:hover {
+    color: var(--s2-nav-text);
+    background: var(--s2-nav-hover-bg);
+}
+
+.s2-breadcrumb-link--current {
+    color: var(--s2-nav-text);
+}
+
+.s2-breadcrumb-sep {
+    margin: 0 8px;
+    color: var(--s2-nav-text-dim);
+}
+
+/* ── Dropdown panel ──
+   Positioned by DropdownMenu.vue (fixed coords from the trigger rect), so only the surface
+   lives here. Width follows the content, as it always has. */
+.s2-dropdown {
+    min-width: max-content;
+    padding: 4px 0;
+    border-radius: var(--s2-radius-sm);
+    background: var(--s2-popover);
+    color: var(--s2-popover-text);
+    box-shadow: var(--s2-popover-shadow);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    z-index: 2000;
+}
+
+.s2-dropdown-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    /* A button's `width: auto` shrink-wraps its content, so without this a short label gets a
+       hover chip narrower than its neighbours. The panel sizes to its widest row, and every row
+       has to span that same width. */
+    width: 100%;
+    height: 34px;
+    padding: 0 14px;
+    border: none;
+    background: transparent;
+    color: var(--s2-popover-text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 34px;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* Hover is a floating chip inset from the panel edges, the same treatment the rail rows get
+   (they use an 8px inset because the rail is wider; the panel is narrow, so 4px). */
+.s2-dropdown-item::before {
+    content: '';
+    position: absolute;
+    inset: 0 4px;
+    border-radius: 8px;
+    background: transparent;
+    transition: background-color var(--s2-transition);
+    pointer-events: none;
+}
+
+.s2-dropdown-item:hover::before {
+    background: var(--s2-nav-hover-bg);
+}
+
+/* Active row: the same brand tint the rail's selected pill wears, so the collapsed flyout keeps
+   marking the route you are on */
+.s2-dropdown-item--active::before,
+.s2-dropdown-item--active:hover::before {
+    background: var(--s2-nav-active-bg);
+}
+
+.s2-dropdown-item--active {
+    color: var(--s2-nav-active-text);
+}
+
+.s2-dropdown-item--active .s2-dropdown-item-icon {
+    color: var(--s2-nav-active-text);
+}
+
+.s2-dropdown-item-label {
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.s2-dropdown-item-icon {
+    position: relative;
+    display: none;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+/* Large rows: the flyout the collapsed rail opens, with an icon per entry */
+.s2-dropdown--large .s2-dropdown-item {
+    gap: 11px;
+    height: 40px;
+    padding: 0 11px;
+}
+
+.s2-dropdown--large .s2-dropdown-item-icon {
+    display: flex;
+    align-items: center;
+}
+
+/* Open/close transition: a short fade with a 4px drift — panels hanging below a trigger settle
+   downward, the collapsed rail's right-side flyout settles sideways. Faster than --s2-transition
+   on purpose: a popup that takes 300ms feels sluggish next to the old component library's. */
+.s2-dropdown-enter-active {
+    transition:
+        opacity 0.16s ease-out,
+        transform 0.16s ease-out;
+}
+
+.s2-dropdown-leave-active {
+    transition:
+        opacity 0.1s ease-in,
+        transform 0.1s ease-in;
+}
+
+.s2-dropdown-enter-from,
+.s2-dropdown-leave-to {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+.s2-dropdown--right.s2-dropdown-enter-from,
+.s2-dropdown--right.s2-dropdown-leave-to {
+    transform: translateX(-4px);
+}
+
+/* ── Tooltip ── */
+.s2-tooltip {
+    padding: 8px 14px;
+    border-radius: var(--s2-radius-sm);
+    background: var(--s2-tooltip);
+    color: var(--s2-tooltip-text);
+    box-shadow: var(--s2-tooltip-shadow);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 2000;
+}
+
+/* Heatmap cell bubble: same surface, denser type, and honors the line breaks in the cell texts
+   (date + rx/tx breakdown) */
+.s2-cell-tip {
+    padding: 6px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+/* Same fade+drift vocabulary as the dropdown, pushing away from the trigger along the
+   placement axis (a right-side bubble drifts rightward into place, etc.) */
+.s2-tooltip-enter-active {
+    transition:
+        opacity 0.16s ease-out,
+        transform 0.16s ease-out;
+}
+
+.s2-tooltip-leave-active {
+    transition:
+        opacity 0.1s ease-in,
+        transform 0.1s ease-in;
+}
+
+.s2-tooltip-enter-from,
+.s2-tooltip-leave-to {
+    opacity: 0;
+    transform: translateY(4px);
+}
+
+.s2-tooltip--bottom.s2-tooltip-enter-from,
+.s2-tooltip--bottom.s2-tooltip-leave-to {
+    transform: translateY(-4px);
+}
+
+.s2-tooltip--right.s2-tooltip-enter-from,
+.s2-tooltip--right.s2-tooltip-leave-to {
+    transform: translateX(-4px);
+}
+
+.s2-tooltip--left.s2-tooltip-enter-from,
+.s2-tooltip--left.s2-tooltip-leave-to {
+    transform: translateX(4px);
+}
+
+/* ── Toast ──
+   Shares the popover surface: same fill, radius and elevation, only the inset padding differs. */
+.s2-toast-host {
+    position: fixed;
+    top: 12px;
+    left: 0;
+    right: 0;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.s2-toast {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: var(--s2-radius-sm);
+    background: var(--s2-popover);
+    color: var(--s2-nav-text);
+    box-shadow: var(--s2-popover-shadow);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.s2-toast-icon {
+    flex-shrink: 0;
+    font-size: 20px;
+}
+
+.s2-toast--success .s2-toast-icon {
+    color: var(--tx);
+}
+
+.s2-toast--error .s2-toast-icon {
+    color: var(--danger);
+}
+
+.s2-toast-enter-active,
+.s2-toast-leave-active {
+    transition:
+        opacity var(--s2-transition),
+        transform var(--s2-transition);
+}
+
+.s2-toast-enter-from,
+.s2-toast-leave-to {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
+/* ── Top loading bar ──
+   Indeterminate sweep: the fill grows to full width, then the host fades out. */
+.s2-loading-bar-host {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 4000;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.s2-loading-bar-host--idle {
+    opacity: 0;
+}
+
+.s2-loading-bar {
+    width: 100%;
+    height: 100%;
+    background: var(--brand);
+    transform-origin: left center;
+    animation: s2-loading-sweep 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.s2-loading-bar-host--error .s2-loading-bar {
+    background: var(--danger);
+    animation: none;
+    transform: scaleX(1);
+    opacity: 0;
+    transition:
+        transform 0.2s ease,
+        opacity 0.3s ease 0.2s;
+}
+
+@keyframes s2-loading-sweep {
+    0% {
+        transform: scaleX(0);
+    }
+    60% {
+        transform: scaleX(0.85);
+    }
+    100% {
+        transform: scaleX(0.95);
+    }
+}
+
+/* ── Scroll reveal (About page sections) ──
+   The hidden start state is armed by the view (src/views/About.vue) instead of being baked in here:
+   with JS off, or no IntersectionObserver to arm it, the sections render in place rather than being
+   stranded at opacity 0. Kept in this file so one rule serves every reveal target, which is what a
+   per-component copy kept losing. */
+.s2-reveal {
+    transition:
+        opacity var(--s2-reveal-transition),
+        transform var(--s2-reveal-transition);
+}
+.s2-reveal.s2-reveal-armed:not(.visible) {
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+/* ══ Reduced motion: one gate for every animated surface ══
+   Retiring the two transition tokens kills all `--s2-transition` / `--s2-reveal-transition` driven
+   motion in one move (controls, sheets, menu collapse, popups); the rules after it cover the
+   animations that spell out their own duration. Surfaces whose motion lives in a scoped component
+   style are guarded there instead — a bare class here would lose on specificity. */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --s2-transition: 0.01ms;
+        --s2-reveal-transition: 0.01ms;
+    }
+
+    /* Reveal sections render in place: no offset, no fade */
+    .s2-reveal.s2-reveal-armed:not(.visible) {
+        opacity: 1;
+        transform: none;
+    }
+
+    /* Skeleton shimmer: a static fill instead of a 1.8s loop */
+    .s2-skeleton {
+        animation: none;
+    }
+
+    /* Tooltip/dropdown enter/leave spell out their own duration, so the token override does not
+       reach them (the toast transitions are token-driven and already covered by :root above) */
+    .s2-tooltip-enter-active,
+    .s2-tooltip-leave-active,
+    .s2-dropdown-enter-active,
+    .s2-dropdown-leave-active {
+        transition: none;
+    }
+
+    /* Loading bar: hold the sweep still, the bar itself still reads as progress */
+    .s2-loading-bar {
+        animation: none;
+        transform: scaleX(0.6);
+    }
+}
+
+/* ── S2 table: fixed column widths (desktop) ── */
+@media (--desktop) {
+    .s2-table {
+        table-layout: fixed;
+    }
+}
+
+/* ── S2 responsive: phones and portrait tablets (< 1024px, chart and sidebar stack vertically) ── */
+@media (--mobile) {
+    :root {
+        --s2-radius-lg: 18px;
+    }
+    .s2-sheet-section {
+        padding: 18px 16px;
+    }
+    .s2-chart-area {
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .s2-sidebar-glass {
+        width: 100% !important;
+        max-width: 100%;
+        box-sizing: border-box;
+        border-left: none;
+        border-top: 1px solid var(--s2-border);
+        padding: 16px 0 0;
+    }
+    .s2-metric-band {
+        flex-wrap: wrap;
+        gap: 16px 0;
+    }
+    .s2-metric {
+        flex: 0 0 50%;
+        padding: 0 16px;
+    }
+    .s2-metric:nth-child(2n + 1) {
+        border-left: none;
+        padding-left: 0;
+    }
+    .s2-stat-value {
+        font-size: 20px;
+    }
+    .s2-stat-label {
+        font-size: 11px;
+    }
+    /* Long titles (English) must not fight their hint/legend for one line:
+       the hint drops below the title and both get the full row width. */
+    .s2-section-label {
+        flex-wrap: wrap;
+        row-gap: 6px;
+    }
+}

@@ -1,0 +1,10 @@
+dist
+node_modules
+pnpm-lock.yaml
+
+# gitignored scratch space
+.tmp
+
+# generated files
+src/auto-imports.d.ts
+src/components.d.ts

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="alternate icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+        <!-- Browser chrome tint. Single meta on purpose: Chrome/Android historically ignores the
+             media attribute (takes the first tag), and iOS 26 Safari's handling of theme-color is
+             broken (it can pick the wrong variant). The bootstrap script below and the theme store
+             keep this one tag in sync with the app's actual theme, which can differ from the system.
+             Values mirror --s2-bg. -->
+        <meta name="theme-color" content="#eef1f7" />
+        <title>vnStat Web</title>
+
+        <!-- Blocking script: apply dark class before first paint to prevent white flash -->
+        <script>
+            (function () {
+                var mql = window.matchMedia('(prefers-color-scheme: dark)');
+                var themeColor = document.querySelector('meta[name="theme-color"]');
+                // Manual override persisted by the theme store ('dark' | 'light'); absent or
+                // garbage means follow the OS. Read here so a restored override does not flash.
+                var stored = null;
+                try {
+                    var raw = localStorage.getItem('s2-theme');
+                    stored = raw === 'dark' || raw === 'light' ? raw : null;
+                } catch (e) {}
+                function apply(dark) {
+                    if (dark) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                    // Single theme-color tag follows the theme (see the meta tag's comment)
+                    if (themeColor) themeColor.content = dark ? '#0b0e15' : '#eef1f7';
+                }
+                apply(stored == null ? mql.matches : stored === 'dark');
+                mql.addEventListener('change', function (e) {
+                    // Once the app's theme store is up it owns the dark class and this tag,
+                    // including guarding a manual override from OS changes
+                    if (window.__vnstatThemeManaged) return;
+                    // A persisted override also wins until the store takes over
+                    if (stored != null) return;
+                    apply(e.matches);
+                });
+            })();
+        </script>
+
+        <meta name="color-scheme" content="light dark" />
+
+        <style>
+            html {
+                margin: 0;
+                padding: 0;
+                overflow-y: auto;
+                background-color: #eef1f7;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                min-height: 100%;
+                background-color: #eef1f7;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                html,
+                body {
+                    background-color: #0b0e15;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Browser compatibility check for ES2022 -->
+        <script>
+            // ES5 on purpose: this banner is the fallback for browsers too old to even parse the
+            // bundle, so no modern syntax here. Only English and Chinese are covered: a browser
+            // that old is a rare, high-friction edge case, and keeping one message per language
+            // beats mirroring the app's full locale set. This is deliberately coarser than
+            // resolveAppLocale in src/config/locales.ts (vue-i18n has not loaded yet at this point).
+            if (!Array.prototype.at) {
+                function isChinese() {
+                    var langs = navigator.languages || [navigator.language || 'en'];
+                    for (var i = 0; i < langs.length; i++) {
+                        if ((langs[i] || '').toLowerCase().replace(/_/g, '-').indexOf('zh') === 0) return true;
+                    }
+                    return false;
+                }
+                var MESSAGES = {
+                    zh: '浏览器版本过旧，无法正常显示此页面。请使用最新版本的 Chrome、Edge、Firefox 或 Safari。',
+                    en: 'Your browser is too old to display this page properly. Please use the latest version of Chrome, Edge, Firefox, or Safari.',
+                };
+                var banner = document.createElement('div');
+                banner.id = 'browser-warning';
+                banner.style.cssText =
+                    'position:fixed;top:0;left:0;right:0;z-index:9999;padding:16px;background:#e74c3c;color:#fff;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;line-height:1.5';
+                banner.textContent = isChinese() ? MESSAGES.zh : MESSAGES.en;
+                document.body.appendChild(banner);
+            }
+        </script>
+        <div id="app"></div>
+        <script type="module" src="/src/main.ts"></script>
+    </body>
+</html>
