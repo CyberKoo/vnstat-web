@@ -255,7 +255,7 @@ export default {
         },
         weekHour: {
             aria: 'Heatmap: Wochentag × Stunde',
-            cellTip: '{weekday} {time} · Ø {avg}',
+            cellTip: '{weekday} {time} · {total}',
         },
         yearCard: {
             inProgress: 'Läuft',

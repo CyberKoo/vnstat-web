@@ -256,7 +256,7 @@ export default {
         },
         weekHour: {
             aria: 'Mapa de calor de tráfico por día de la semana y hora',
-            cellTip: '{weekday} {time} · media {avg}',
+            cellTip: '{weekday} {time} · {total}',
         },
         yearCard: {
             inProgress: 'En curso',

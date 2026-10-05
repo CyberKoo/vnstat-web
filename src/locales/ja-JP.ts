@@ -253,7 +253,7 @@ export default {
         },
         weekHour: {
             aria: '曜日 × 時間帯トラフィックヒートマップ',
-            cellTip: '{weekday} {time} · 平均 {avg}',
+            cellTip: '{weekday} {time} · {total}',
         },
         yearCard: {
             inProgress: '進行中',

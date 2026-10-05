@@ -26,20 +26,6 @@ export interface HourlyProfileCell {
     recentTotal: number | null;
 }
 
-/**
- * One cell of the weekday × hour matrix.
- */
-export interface WeekHourCell {
-    /** Weekday (0=Sunday, 1=Monday … 6=Saturday, same as Date.getDay) */
-    weekday: number;
-    /** Hour (0-23) */
-    hour: number;
-    /** Historical average total bytes */
-    avgTotal: number;
-    /** Number of samples included in the average */
-    samples: number;
-}
-
 /** Hours per day */
 const HOURS_PER_DAY = 24;
 
@@ -127,25 +113,38 @@ export function buildHourlyProfile(items: TrafficItem[]): HourlyProfileCell[] {
 }
 
 /**
- * Aggregate the weekday × hour average traffic matrix from historical hourly traffic.
+ * Aggregate the weekday × hour traffic matrix for the current week.
+ *
+ * Only records from the current week (Monday 00:00 local time up to `now`) are counted: on a
+ * Monday the Tuesday–Sunday rows stay empty instead of showing last week's data. Each cell can
+ * have at most one sample per week, so the "average" of a cell is simply its actual total.
  *
  * The matrix is ordered "Monday first, Sunday last" (row index 0=Monday … 6=Sunday),
  * with 24 columns per row (hours 0-23).
  *
  * @param items List of hourly traffic data items (ascending by time)
- * @returns A 7×24 matrix of average total traffic (rows: Monday~Sunday, columns: hours 0-23)
+ * @param now Reference time for "current week" (injectable for tests)
+ * @returns A 7×24 matrix of total traffic (rows: Monday~Sunday, columns: hours 0-23)
  *
  * @example
  * ```ts
  * const matrix = buildWeekHourMatrix(hourItems);
- * console.log(matrix[0][9]); // historical average traffic on Monday at 9 AM
+ * console.log(matrix[0][9]); // this week's traffic on Monday at 9 AM
  * ```
  */
-export function buildWeekHourMatrix(items: TrafficItem[]): number[][] {
+export function buildWeekHourMatrix(items: TrafficItem[], now: Date = new Date()): number[][] {
     const sums = Array.from({ length: DAYS_PER_WEEK }, () => new Array<number>(HOURS_PER_DAY).fill(0));
     const counts = Array.from({ length: DAYS_PER_WEEK }, () => new Array<number>(HOURS_PER_DAY).fill(0));
 
+    // Current week starting Monday 00:00 local (Date.getDay: 0=Sunday → 6 days back, 1=Monday → 0)
+    const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % DAYS_PER_WEEK));
+    const fromSec = weekStart.getTime() / MS_IN_SECOND;
+    const toSec = now.getTime() / MS_IN_SECOND;
+
     for (const item of items) {
+        // Out-of-window records are other weeks (or clock-skewed future ones): leave them out
+        if (item.timestamp < fromSec || item.timestamp > toSec) continue;
         const weekday = itemWeekday(item);
         const hour = itemHour(item);
         if (hour < 0 || hour >= HOURS_PER_DAY) continue;
@@ -173,7 +172,7 @@ export type InterfaceDetailSource = Pick<ReturnType<typeof useInterfaceDetailSto
  *
  * Aggregated from traffic.hour of the interface detail:
  * - `profile`: historical average traffic per hour 0-23 + the actual values of the most recent 24h
- * - `weekMatrix`: 7×24 weekday × hour matrix of historical average traffic (rows: Monday~Sunday)
+ * - `weekMatrix`: 7×24 weekday × hour matrix of the current week's traffic (rows: Monday~Sunday)
  *
  * @param detail Source of the interface detail; defaults to the global store
  * @returns The reactive hour-of-day profile and weekday × hour matrix
@@ -187,7 +186,7 @@ export function useHourlyProfile(detail: InterfaceDetailSource = useInterfaceDet
     /** Hour-of-day profile for hours 0-23 */
     const profile = computed<HourlyProfileCell[]>(() => buildHourlyProfile(hourItems.value));
 
-    /** 7×24 weekday × hour average traffic matrix (rows: Monday~Sunday) */
+    /** 7×24 weekday × hour matrix of the current week's traffic (rows: Monday~Sunday) */
     const weekMatrix = computed<number[][]>(() => buildWeekHourMatrix(hourItems.value));
 
     return { profile, weekMatrix };

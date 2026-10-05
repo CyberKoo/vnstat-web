@@ -254,7 +254,7 @@ export default {
         },
         weekHour: {
             aria: 'Weekday × hour traffic heatmap',
-            cellTip: '{weekday} {time} · avg {avg}',
+            cellTip: '{weekday} {time} · {total}',
         },
         yearCard: {
             inProgress: 'In progress',

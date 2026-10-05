@@ -264,7 +264,7 @@ export default {
         },
         weekHour: {
             aria: '星期×小时流量热力矩阵',
-            cellTip: '{weekday} {time} · 平均 {avg}',
+            cellTip: '{weekday} {time} · {total}',
         },
         yearCard: {
             inProgress: '进行中',

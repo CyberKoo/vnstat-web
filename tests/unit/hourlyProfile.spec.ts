@@ -85,25 +85,34 @@ describe('buildHourlyProfile', () => {
 });
 
 describe('buildWeekHourMatrix', () => {
+    // 2024-01-03 is a Wednesday: the current week runs from Monday 2024-01-01 00:00 up to now
+    const NOW = new Date(2024, 0, 3, 12, 0, 0);
+
     it('returns a 7x24 matrix with rows ordered Monday to Sunday', () => {
-        const matrix = buildWeekHourMatrix([]);
+        const matrix = buildWeekHourMatrix([], NOW);
         expect(matrix).toHaveLength(7);
         for (const row of matrix) expect(row).toHaveLength(24);
     });
 
-    it('aggregates the average by weekday x hour', () => {
-        // 2024-01-01 is a Monday: two records at Monday 09:00, one at Tuesday 09:00
-        const items = [makeHour(9, 1000, 0, 0), makeHour(9, 3000, 0, 7), makeHour(9, 2000, 0, 1)];
-        const matrix = buildWeekHourMatrix(items);
-        expect(matrix[0][9]).toBe(2000); // Monday = row 0
+    it('keeps only current-week records: previous weeks and future records are dropped', () => {
+        const items = [
+            makeHour(9, 1000, 0, -7), // last week's Monday 09:00 → dropped
+            makeHour(9, 3000, 0, 0), // this week's Monday 09:00 → kept
+            makeHour(9, 2000, 0, 1), // this week's Tuesday 09:00 → kept
+            makeHour(10, 8000, 0, 5), // this week's Saturday 10:00, but after NOW → dropped
+        ];
+        const matrix = buildWeekHourMatrix(items, NOW);
+        expect(matrix[0][9]).toBe(3000); // Monday = row 0: only this week's record, not the average
         expect(matrix[1][9]).toBe(2000); // Tuesday = row 1
-        expect(matrix[2][9]).toBe(0); // Wednesday has no data
+        expect(matrix[2][9]).toBe(0); // Wednesday 09:00 has no data
+        expect(matrix[5][10]).toBe(0); // Saturday has not happened yet at NOW
     });
 
     it('puts Sunday on the last row (Date.getDay 0=Sunday -> row 6)', () => {
-        // 2024-01-07 is a Sunday
+        // 2024-01-07 is a Sunday; evaluate at that Sunday
+        const sunday = new Date(2024, 0, 7, 23, 0, 0);
         const items = [makeHour(15, 500, 500, 6)];
-        const matrix = buildWeekHourMatrix(items);
+        const matrix = buildWeekHourMatrix(items, sunday);
         expect(matrix[6][15]).toBe(1000);
         expect(matrix[0][15]).toBe(0);
     });

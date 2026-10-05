@@ -255,7 +255,7 @@ export default {
         },
         weekHour: {
             aria: 'Тепловая карта трафика: день недели × час',
-            cellTip: '{weekday} {time} · среднее {avg}',
+            cellTip: '{weekday} {time} · {total}',
         },
         yearCard: {
             inProgress: 'В процессе',
