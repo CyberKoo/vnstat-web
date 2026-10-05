@@ -34,8 +34,8 @@
     /* ── Glass surfaces ──
        Liquid Glass material: translucent fill, blur + saturation, and a specular edge
        (--s2-glass-edge: bright top rim, faint dark bottom rim) applied through box-shadow. */
-    --s2-glass-bg: rgba(255, 255, 255, 0.48);
-    --s2-glass-bg-strong: rgba(255, 255, 255, 0.62);
+    --s2-glass-bg: rgba(255, 255, 255, 0.32);
+    --s2-glass-bg-strong: rgba(255, 255, 255, 0.46);
     --s2-glass-border: rgba(255, 255, 255, 0.7);
     --s2-glass-blur: 28px;
     --s2-glass-saturate: 180%;
@@ -49,10 +49,10 @@
     --s2-drawer-dim: blur(4px) brightness(0.94) saturate(0.88);
 
     /* ── Aurora background ── */
-    --s2-aurora-1: rgba(76, 111, 255, 0.2);
-    --s2-aurora-2: rgba(12, 148, 80, 0.13);
-    --s2-aurora-3: rgba(180, 105, 0, 0.1);
-    --s2-aurora-4: rgba(139, 92, 246, 0.12);
+    --s2-aurora-1: rgba(76, 111, 255, 0.34);
+    --s2-aurora-2: rgba(12, 148, 80, 0.24);
+    --s2-aurora-3: rgba(180, 105, 0, 0.18);
+    --s2-aurora-4: rgba(139, 92, 246, 0.24);
 
     /* ── Data colors (theme-invariant, mirror of config/colors.ts palette) ── */
     --brand: #7c5cff;
@@ -134,18 +134,18 @@
     --s2-btn-surface: rgba(232, 235, 244, 0.06);
     --s2-btn-surface-hover: rgba(232, 235, 244, 0.12);
 
-    --s2-glass-bg: rgba(21, 26, 40, 0.4);
-    --s2-glass-bg-strong: rgba(21, 26, 40, 0.6);
-    --s2-glass-border: rgba(255, 255, 255, 0.13);
-    --s2-glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+    --s2-glass-bg: rgba(21, 26, 40, 0.28);
+    --s2-glass-bg-strong: rgba(21, 26, 40, 0.42);
+    --s2-glass-border: rgba(255, 255, 255, 0.16);
+    --s2-glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 rgba(0, 0, 0, 0.35);
 
     --s2-drawer-dim: blur(4px) brightness(0.72) saturate(0.9);
 
     /* Aurora runs brighter in dark mode so the more translucent glass has color to refract */
-    --s2-aurora-1: rgba(76, 111, 255, 0.2);
-    --s2-aurora-2: rgba(12, 148, 80, 0.14);
-    --s2-aurora-3: rgba(180, 105, 0, 0.12);
-    --s2-aurora-4: rgba(139, 92, 246, 0.16);
+    --s2-aurora-1: rgba(76, 111, 255, 0.34);
+    --s2-aurora-2: rgba(12, 148, 80, 0.26);
+    --s2-aurora-3: rgba(180, 105, 0, 0.2);
+    --s2-aurora-4: rgba(139, 92, 246, 0.3);
 
     --s2-chart-text: #ffffff;
     --s2-chart-grid: rgba(255, 255, 255, 0.38);
@@ -199,10 +199,10 @@ body::before {
     z-index: 0;
     pointer-events: none;
     background:
-        radial-gradient(56vw 40vh at 12% 0%, var(--s2-aurora-1), transparent 70%),
-        radial-gradient(48vw 36vh at 88% 12%, var(--s2-aurora-2), transparent 70%),
-        radial-gradient(60vw 44vh at 50% 108%, var(--s2-aurora-3), transparent 70%),
-        radial-gradient(42vw 38vh at 88% 88%, var(--s2-aurora-4), transparent 70%);
+        radial-gradient(46vw 34vh at 10% 0%, var(--s2-aurora-1), transparent 70%),
+        radial-gradient(42vw 32vh at 90% 8%, var(--s2-aurora-2), transparent 70%),
+        radial-gradient(52vw 40vh at 50% 100%, var(--s2-aurora-3), transparent 70%),
+        radial-gradient(40vw 34vh at 86% 82%, var(--s2-aurora-4), transparent 70%);
 }
 
 #app {
@@ -1393,4 +1393,47 @@ body::before {
         flex-wrap: wrap;
         row-gap: 6px;
     }
+}
+
+/* ── Theme iris transition ──
+   The iris reveal from utils/themeTransition.ts: expanding circle of the incoming theme when
+   going dark, shrinking circle of the outgoing theme when going light. The default crossfade is
+   disabled so only the clip-path animation plays. */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+    z-index: 1;
+}
+
+::view-transition-new(root) {
+    z-index: 2147483646;
+    /* Start fully clipped away: a browser that paints the new snapshot before the WAAPI
+       clip-path animation's first frame (WebKit) would otherwise flash the new theme
+       full-screen. The animation (fill: both) overrides this from its first frame on. */
+    clip-path: circle(0px at var(--iris-x, 50vw) var(--iris-y, 50vh));
+}
+
+/* Retract direction (dark to light, see utils/themeTransition.ts): the stacking flips — the old
+   dark snapshot sits on top and the JS animation shrinks its circle back into the click point,
+   revealing the new light snapshot that lies fully visible underneath. The new snapshot must not
+   keep the expand pre-clip, or there would be nothing underneath to reveal. */
+html.s2-theme-iris-retract::view-transition-old(root) {
+    z-index: 2147483646;
+}
+
+html.s2-theme-iris-retract::view-transition-new(root) {
+    z-index: 1;
+    clip-path: none;
+}
+
+/* While the iris runs, freeze every property transition: the new snapshot is captured the
+   instant the dark class flips, and a theme-driven background/color transition still mid-flight
+   would bake old-theme pixels into the revealed circle. */
+html.s2-theme-iris,
+html.s2-theme-iris * {
+    transition: none !important;
 }

@@ -11,7 +11,7 @@
         :is-dark="themeStore.isDark"
         :refreshing="refreshing"
         @refresh="refresh"
-        @toggle-dark="themeStore.toggleDark"
+        @toggle-dark="onToggleDark"
         @open-drawer="drawerVisible = true"
     />
 
@@ -120,6 +120,7 @@ import { useSettingsStore } from '@/stores/settings';
 import { useInterfaceStore } from '@/stores/interface';
 import { useInterfaceCatalog } from '@/composables/useInterfaceCatalog';
 import { useRouteChrome } from '@/composables/useRouteChrome';
+import { revealThemeTransition } from '@/utils/themeTransition';
 
 import LayoutSider from '@/components/LayoutSider.vue';
 import LayoutHeader from '@/components/LayoutHeader.vue';
@@ -139,6 +140,11 @@ const { refresh, refreshing } = useInterfaceCatalog();
 /** Focus target on route changes: the visually hidden page heading rendered below */
 const pageHeading = ref<HTMLElement | null>(null);
 useRouteChrome(drawerVisible, pageHeading);
+
+/** Iris reveal around the store toggle; falls back to an instant switch (see the util) */
+function onToggleDark(event: MouseEvent) {
+    revealThemeTransition(event, themeStore.toggleDark);
+}
 
 const { isMobile } = useMobile();
 
@@ -263,13 +269,9 @@ watch(isMobile, (val) => {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 1440px;
-}
-
-@media (min-width: 2560px) {
-    .s2-content-wrapper {
-        max-width: 1920px;
-    }
+    /* Fluid cap: keeps ~120px side gutters on wide viewports (1680px column at 1920), floors
+       at the old 1440px cap for narrower ones, and never exceeds 1920px on very wide screens */
+    max-width: clamp(1440px, calc(100vw - 240px), 1920px);
 }
 
 /* Focus target after each navigation (see useRouteChrome): the heading is clipped to nothing by

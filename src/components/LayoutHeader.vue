@@ -58,7 +58,7 @@
                 class="s2-header-btn"
                 :title="isDark ? t('header.toLight') : t('header.toDark')"
                 :aria-label="isDark ? t('header.toLight') : t('header.toDark')"
-                @click="$emit('toggleDark')"
+                @click="$emit('toggleDark', $event)"
             >
                 <svg
                     v-if="isDark"
@@ -125,7 +125,7 @@ defineProps<{
 
 defineEmits<{
     refresh: [];
-    toggleDark: [];
+    toggleDark: [event: MouseEvent];
     openDrawer: [];
 }>();
 </script>

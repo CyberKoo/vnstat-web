@@ -24,7 +24,8 @@ const version = import.meta.env.VITE_APP_VERSION;
 
 .s2-footer-inner {
     width: 100%;
-    max-width: 1440px;
+    /* Same fluid cap as BaseLayout's .s2-content-wrapper so the footer stays aligned with it */
+    max-width: clamp(1440px, calc(100vw - 240px), 1920px);
     margin: 0 auto;
     text-align: center;
     box-sizing: border-box;
@@ -34,12 +35,6 @@ const version = import.meta.env.VITE_APP_VERSION;
 .s2-footer-text {
     color: var(--s2-text-muted, #646c82);
     font-size: 13px;
-}
-
-@media (min-width: 2560px) {
-    .s2-footer-inner {
-        max-width: 1920px;
-    }
 }
 
 @media (--mobile) {
