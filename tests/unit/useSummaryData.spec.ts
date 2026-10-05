@@ -3,7 +3,12 @@ import { ref } from 'vue';
 
 import { useSummaryData } from '@/composables/useSummaryData';
 import { formatBytes } from '@/utils/bytes';
-import type { VnstatInterfaceDetail } from '@/types/network';
+import type { TrafficItem, VnstatInterfaceDetail } from '@/types/network';
+
+/** Minimal traffic record; only rx/tx/timestamp matter to useSummaryData */
+function rec(rx: number, tx: number, timestamp: number): TrafficItem {
+    return { rx, tx, timestamp, id: timestamp, date: { year: 2026, month: 1, day: 1 } };
+}
 
 /** Minimal interface detail; only the traffic arrays matter to useSummaryData */
 function makeDetail(traffic: Partial<VnstatInterfaceDetail['traffic']> = {}): VnstatInterfaceDetail {
@@ -38,12 +43,9 @@ describe('useSummaryData', () => {
     it('sums the last record of each period once loaded', () => {
         const source = ref<VnstatInterfaceDetail | null>(
             makeDetail({
-                day: [
-                    { rx: 1, tx: 1, timestamp: 1 },
-                    { rx: 1000, tx: 500, timestamp: 2 },
-                ],
-                fiveminute: [{ rx: 100, tx: 20, timestamp: 1 }],
-                month: [{ rx: 10_000, tx: 5_000, timestamp: 1 }],
+                day: [rec(1, 1, 1), rec(1000, 500, 2)],
+                fiveminute: [rec(100, 20, 1)],
+                month: [rec(10_000, 5_000, 1)],
                 total: { rx: 999, tx: 1 },
             }),
         );
@@ -68,7 +70,7 @@ describe('useSummaryData', () => {
         const source = ref<VnstatInterfaceDetail | null>(null);
         const { todayTotal } = useSummaryData(source);
         expect(todayTotal.value).toBe('-');
-        source.value = makeDetail({ day: [{ rx: 8, tx: 8, timestamp: 1 }] });
+        source.value = makeDetail({ day: [rec(8, 8, 1)] });
         expect(todayTotal.value).toBe(formatBytes(16).formatted);
     });
 });

@@ -1,5 +1,5 @@
-import { Backoff, type BackoffOptions } from '@/utils/backoff';
-import { ReconnectScheduler } from '@/utils/reconnectScheduler';
+import { Backoff, type BackoffOptions } from '@/utils/sse/backoff';
+import { ReconnectScheduler } from '@/utils/sse/reconnectScheduler';
 
 /** Reconnect policy configuration */
 export interface ReconnectPolicyOptions {

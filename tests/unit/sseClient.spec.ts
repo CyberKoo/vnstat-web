@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SseClient } from '@/utils/sseClient';
+import { SseClient } from '@/utils/sse/client';
 
 /** An EventSource stub that records instances and lets a test drive the lifecycle */
 class FakeEventSource {

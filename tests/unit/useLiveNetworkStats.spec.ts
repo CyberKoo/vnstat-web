@@ -18,6 +18,7 @@ const { sseInstances, MockSseClient } = vi.hoisted(() => {
 
     class MockSseClient {
         static instances: MockSseClient[] = [];
+        readonly prefix: string;
         readonly opts: MockOpts;
         readonly open = vi.fn();
         readonly close = vi.fn();
@@ -26,10 +27,8 @@ const { sseInstances, MockSseClient } = vi.hoisted(() => {
         readonly addEventHandler = vi.fn();
         readonly isOpen = vi.fn(() => false);
 
-        constructor(
-            readonly prefix: string,
-            opts: MockOpts,
-        ) {
+        constructor(prefix: string, opts: MockOpts) {
+            this.prefix = prefix;
             this.opts = opts;
             MockSseClient.instances.push(this);
         }
@@ -38,7 +37,7 @@ const { sseInstances, MockSseClient } = vi.hoisted(() => {
     return { sseInstances: MockSseClient.instances, MockSseClient };
 });
 
-vi.mock('@/utils/sseClient', () => ({ SseClient: MockSseClient }));
+vi.mock('@/utils/sse/client', () => ({ SseClient: MockSseClient }));
 
 /** Minimal valid frame payload */
 function validStats(): NetworkStats {

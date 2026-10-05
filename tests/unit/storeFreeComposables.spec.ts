@@ -176,7 +176,7 @@ describe('store-free composables', () => {
             });
             app.mount(document.createElement('div'));
 
-            const before = app._container.textContent;
+            const before = app._container?.textContent;
             isDark.value = true;
             await nextTick();
             // The watcher is post-flushed, so give it a tick

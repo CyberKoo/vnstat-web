@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SseEventRegistry, type EventListenerTarget } from '@/utils/sseEventRegistry';
+import { SseEventRegistry, type EventListenerTarget } from '@/utils/sse/eventRegistry';
 
 /** A connection stub that records what was attached and detached */
 function fakeTarget() {

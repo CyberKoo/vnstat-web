@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import request from '@/utils/request';
+import request from '@/api/request';
 
 function jsonResponse(body: unknown, init: { status?: number; statusText?: string } = {}) {
     return new Response(JSON.stringify(body), {

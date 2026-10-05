@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted, type Ref, shallowRef, watch } fro
 import { RingBuffer } from '@/utils/ringBuffer';
 import { API_BASE_URL, SSE_SHUTDOWN_RECONNECT_DELAY_MS } from '@/config';
 import type { NetworkStats, TimedNetworkStats } from '@/types/network';
-import { SseClient } from '@/utils/sseClient';
+import { SseClient } from '@/utils/sse/client';
 import { useSpeedFormat } from '@/composables/useSpeedFormat';
 
 /**

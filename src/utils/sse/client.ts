@@ -1,6 +1,6 @@
-import { createVisibilityPause } from '@/utils/createVisibilityPause';
-import { ReconnectPolicy, type ReconnectPolicyOptions } from '@/utils/reconnectPolicy';
-import { SseEventRegistry } from '@/utils/sseEventRegistry';
+import { createVisibilityPause } from '@/utils/sse/createVisibilityPause';
+import { ReconnectPolicy, type ReconnectPolicyOptions } from '@/utils/sse/reconnectPolicy';
+import { SseEventRegistry } from '@/utils/sse/eventRegistry';
 
 /**
  * Event handler collection

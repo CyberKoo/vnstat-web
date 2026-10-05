@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { Backoff } from '@/utils/backoff';
+import { Backoff } from '@/utils/sse/backoff';
 
 describe('Backoff', () => {
     it('defaults to initial 1000, factor 2 and max 30000', () => {

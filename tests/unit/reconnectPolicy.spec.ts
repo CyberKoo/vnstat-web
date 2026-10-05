@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ReconnectPolicy } from '@/utils/reconnectPolicy';
+import { ReconnectPolicy } from '@/utils/sse/reconnectPolicy';
 
 describe('ReconnectPolicy', () => {
     beforeEach(() => {

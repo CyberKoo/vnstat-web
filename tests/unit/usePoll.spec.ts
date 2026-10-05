@@ -7,8 +7,8 @@ import { usePoll } from '@/composables/usePoll';
 /**
  * Run a composable inside a component context (triggers onMounted/onUnmounted).
  */
-function withSetup<T extends (...args: never[]) => unknown>(composable: T): [ReturnType<T>, App] {
-    let result!: ReturnType<T>;
+function withSetup<T>(composable: () => T): [T, App] {
+    let result!: T;
     const app = createApp({
         setup() {
             result = composable();
@@ -118,17 +118,17 @@ describe('usePoll', () => {
     });
 
     it('cancels the in-flight task on stop (signal.aborted)', async () => {
-        let receivedSignal: AbortSignal | null = null;
+        const signals: (AbortSignal | null)[] = [];
         let resolveTask!: () => void;
         const task = vi.fn().mockImplementation(({ signal }: { signal: AbortSignal | null }) => {
-            receivedSignal = signal;
+            signals.push(signal);
             return new Promise<void>((r) => (resolveTask = r));
         });
         const [poll] = withSetup(() => usePoll(task, { intervalMs: 1000 }));
 
-        expect(receivedSignal?.aborted).toBe(false);
+        expect(signals[0]?.aborted).toBe(false);
         poll.stop();
-        expect(receivedSignal?.aborted).toBe(true);
+        expect(signals[0]?.aborted).toBe(true);
 
         resolveTask();
         await flushPromises();
