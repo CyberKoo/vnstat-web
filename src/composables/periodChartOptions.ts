@@ -15,6 +15,7 @@ import {
 import type { TrafficItem } from '@/types/network';
 import { createAdaptiveBarChartOptions } from '@/utils/chartOptions';
 import { formatBytes } from '@/utils/bytes';
+import { formatNumber } from '@/utils/numbers';
 
 export interface PeriodChartOptionsInput {
     config: PeriodConfig;
@@ -90,7 +91,7 @@ export function buildPeriodChartOptions(input: PeriodChartOptionsInput): ChartOp
     if (config.hasWeekOverWeek) {
         // translated labels of the overlay lines (built with the same t() calls as the datasets)
         const overlayLabels = [
-            i18n.global.t(MOVING_AVERAGE_LABEL, { days: WEEK_WINDOW }),
+            i18n.global.t(MOVING_AVERAGE_LABEL, { days: formatNumber(WEEK_WINDOW) }, WEEK_WINDOW),
             i18n.global.t(LAST_WEEK_LABEL),
             i18n.global.t(GHOST_LABEL),
         ];

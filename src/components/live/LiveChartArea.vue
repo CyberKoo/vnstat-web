@@ -146,6 +146,7 @@
 <script lang="ts" setup>
 import { computed, nextTick, ref, useId, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { formatNumber } from '@/utils/numbers';
 
 import RealTimeLine from '@/components/live/RealTimeLine.vue';
 
@@ -242,12 +243,12 @@ const thresholdSet = computed(() => settingsStore.liveThresholdMbps != null);
 /** Threshold button tooltip and panel state line, each a whole translated sentence */
 const thresholdBtnTitle = computed(() =>
     thresholdSet.value
-        ? t('live.chart.thresholdActive', { value: settingsStore.liveThresholdMbps })
+        ? t('live.chart.thresholdActive', { value: formatNumber(settingsStore.liveThresholdMbps ?? 0) })
         : t('live.chart.thresholdSet'),
 );
 const thresholdState = computed(() =>
     thresholdSet.value
-        ? t('live.chart.thresholdOn', { value: settingsStore.liveThresholdMbps })
+        ? t('live.chart.thresholdOn', { value: formatNumber(settingsStore.liveThresholdMbps ?? 0) })
         : t('live.chart.thresholdOff'),
 );
 
@@ -255,7 +256,11 @@ const thresholdState = computed(() =>
 
 const peakAt = computed(() => t('live.sidebar.at', { time: props.peakTimeStr }));
 const troughAt = computed(() => t('live.sidebar.at', { time: props.troughTimeStr }));
-const uptimeDays = computed(() => t('live.sidebar.days', { count: props.daysSinceCreation }));
+// Rendered only when daysSinceCreation is non-null (template guards the null case)
+const uptimeDays = computed(() => {
+    const count = props.daysSinceCreation ?? 0;
+    return t('live.sidebar.days', { count: formatNumber(count) }, count);
+});
 const sinceCreated = computed(() => t('live.sidebar.since', { date: props.createdDate }));
 
 function toggleThrPanel() {

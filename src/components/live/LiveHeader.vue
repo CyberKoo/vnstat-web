@@ -17,8 +17,12 @@
                 {{ t('common.updated') }} <span class="mono">{{ formattedNow }}</span>
             </div>
             <div class="s2-live-meta-line">
-                {{ interfaceName }} &middot; <span class="mono">{{ totalSamples }}</span>
-                {{ t('live.header.samplesSuffix') }}
+                {{ interfaceName }} &middot;
+                <i18n-t keypath="live.header.samples" :plural="totalSamples" scope="global" tag="span">
+                    <template #count>
+                        <span class="mono">{{ formatNumber(totalSamples, { useGrouping: true }) }}</span>
+                    </template>
+                </i18n-t>
             </div>
         </div>
     </div>
@@ -26,6 +30,7 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n';
+import { formatNumber } from '@/utils/numbers';
 
 const { t } = useI18n();
 

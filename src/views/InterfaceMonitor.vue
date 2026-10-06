@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRef, watch } from 'vue';
+import { computed, shallowRef, toRef, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
 
@@ -124,15 +124,12 @@ const {
 
 // ── S2 computed data ──
 
-/** Last time the data was updated */
-const formattedNow = ref('');
-watch(
-    latestTraffic,
-    () => {
-        formattedNow.value = dayjs().format(t('common.format.timeSeconds'));
-    },
-    { immediate: true },
-);
+/** Local receipt time, initialized even before the first sample arrives. */
+const lastReceivedAt = shallowRef(Date.now());
+watch(latestTraffic, () => {
+    lastReceivedAt.value = Date.now();
+});
+const formattedNow = computed(() => dayjs(lastReceivedAt.value).format(t('common.format.timeSeconds')));
 
 /** Interface name */
 const interfaceName = computed(() => detailRef.value?.name ?? '-');

@@ -1,6 +1,7 @@
 import type { ChartData } from 'chart.js';
 
 import dayjs from '@/plugins/dayjs';
+import { formatNumber } from '@/utils/numbers';
 import { palette } from '@/config/colors';
 import { i18n } from '@/plugins/i18n';
 import type { PeriodConfig } from '@/config/trafficPeriods';
@@ -204,7 +205,7 @@ export function buildPeriodChartData(input: PeriodChartDataInput): ChartData<'ba
 
         datasets.push({
             type: 'line',
-            label: i18n.global.t(MOVING_AVERAGE_LABEL, { days: WEEK_WINDOW }),
+            label: i18n.global.t(MOVING_AVERAGE_LABEL, { days: formatNumber(WEEK_WINDOW) }, WEEK_WINDOW),
             data: ma7,
             fill: false,
             borderColor: palette.accent,

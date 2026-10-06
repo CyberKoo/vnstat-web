@@ -2,6 +2,7 @@ import { type ChartData, type ChartOptions, type Scale, type Tick, type TooltipI
 import { BYTES_UNITS, BYTES_UNITS_DESC, type ByteUnit, compareUnit } from '@/constants';
 import { i18n } from '@/plugins/i18n';
 import type { ChartTheme } from '@/types/chart';
+import { formatDecimal } from '@/utils/numbers';
 
 /**
  * Chooses a unified display unit automatically from the maximum value in the dataset
@@ -174,7 +175,7 @@ export function createAdaptiveBarChartOptions(params: {
                     label: function (context: TooltipItem<'bar'>) {
                         // Convert the raw byte value to the selected unit
                         const valueBytes = (context.parsed.y || 0) / unitSize;
-                        return `${context.dataset.label}: ${valueBytes.toFixed(2)} ${unitLabel}`;
+                        return `${context.dataset.label}: ${formatDecimal(valueBytes, 2)} ${unitLabel}`;
                     },
                 },
             },
@@ -237,7 +238,7 @@ export function createAdaptiveBarChartOptions(params: {
                         // Convert to the selected unit and format (integer, since stepSize keeps values as
                         // multiples of unitSize)
                         const v = vBytes / unitSize;
-                        return `${v.toFixed(0)} ${unitLabel}`;
+                        return `${formatDecimal(v, 0)} ${unitLabel}`;
                     },
                 },
             },

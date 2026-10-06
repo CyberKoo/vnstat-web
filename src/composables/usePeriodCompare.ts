@@ -1,4 +1,5 @@
 import { computeTotalBytes } from '@/composables/useTrafficStats';
+import { formatDecimal } from '@/utils/numbers';
 import type { TrafficItem } from '@/types/network';
 import type { PeriodType } from '@/config/trafficPeriods';
 
@@ -116,9 +117,9 @@ export function computePeriodCompare(current: TrafficItem[], previous: TrafficIt
  */
 export function formatComparePercent(percent: number | null): string {
     if (percent === null) return '-';
-    if (percent > 0) return `↑ +${percent.toFixed(1)}%`;
-    if (percent < 0) return `↓ ${percent.toFixed(1)}%`;
-    return '→ 0.0%';
+    if (percent > 0) return `↑ +${formatDecimal(percent, 1)}%`;
+    if (percent < 0) return `↓ ${formatDecimal(percent, 1)}%`;
+    return `→ ${formatDecimal(0, 1)}%`;
 }
 
 /**

@@ -1,9 +1,8 @@
 /**
- * Simplified Chinese message catalog (source of truth).
+ * Simplified Chinese message catalog.
  *
- * The migration to i18n is incremental: keys are added here (and in every other
- * catalog) as each view is converted. Keys are grouped by view, then by the
- * region of the UI they belong to.
+ * Key structure and interpolation parameters stay in sync across all catalogs.
+ * Keys are grouped by view, then by the region of the UI they belong to.
  *
  * Notes on structure:
  * - Composed sentences are written as whole messages with named or positional
@@ -380,7 +379,7 @@ export default {
             rxLabel: '接收 · RX',
             txLabel: '发送 · TX',
             todayTotal: '今日 · 累计',
-            samplesSuffix: '条采样',
+            samples: '{count} 条采样',
         },
         compact: {
             title: '24 小时概览',

@@ -129,6 +129,7 @@ import { useMobile } from '@/composables/useMobile';
 import { useDayjs } from '@/composables/useDayjs';
 import { useSpeedFormat } from '@/composables/useSpeedFormat';
 import { formatBytes } from '@/utils/bytes';
+import { formatDecimal } from '@/utils/numbers';
 import { hexToRgba } from '@/utils/color';
 import { useInterfaceDetailStore } from '@/stores/interfaceDetail';
 import { palette } from '@/config/colors';
@@ -287,7 +288,7 @@ const sideStats = computed(() => {
         count,
         total: formatBytes(total).formatted,
         peakPercent: peakSharePercent(items),
-        rxPercent: total > 0 ? ((totalRx / total) * 100).toFixed(1) + '%' : '0%',
+        rxPercent: total > 0 ? formatDecimal((totalRx / total) * 100, 1) + '%' : '0%',
     };
 });
 

@@ -7,6 +7,7 @@
 <script lang="ts" setup>
 import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import uPlot from 'uplot';
+import { useI18n } from 'vue-i18n';
 import 'uplot/dist/uPlot.min.css';
 
 import { useMobile } from '@/composables/useMobile';
@@ -28,6 +29,7 @@ const props = defineProps<{
 
 const containerRef = ref<HTMLDivElement>();
 const { isMobile } = useMobile();
+const { locale } = useI18n();
 
 // ── Settings: rate threshold (Mbps → bytes/s) ──
 const settingsStore = useSettingsStore();
@@ -251,6 +253,14 @@ function startPlot() {
 }
 
 onMounted(startPlot);
+
+watch(locale, () => {
+    if (!plot) return;
+    // recalcAxes refreshes uPlot's cached axis values even with unchanged scales/data.
+    plot.redraw(false, true);
+    plot.setCursor({ left: plot.cursor.left ?? -10, top: plot.cursor.top ?? -10 });
+    updateMobileLabels();
+});
 
 watch(isMobile, () => {
     startPlot();

@@ -1,7 +1,7 @@
 /**
  * English message catalog.
  *
- * Key structure must stay in sync with `zh-CN.ts` (which is the source of truth).
+ * Key structure and interpolation parameters must stay in sync across all catalogs.
  *
  * Notes on structure:
  * - Composed sentences are whole messages with parameters; the word order here
@@ -67,11 +67,11 @@ export default {
             ariaReached: '{percent}% of the daily average reached',
         },
         trend: {
-            title: 'All interfaces · last {days} days',
+            title: 'All interfaces · last {days} day | All interfaces · last {days} days',
             rx: 'RX',
             tx: 'TX',
             loadFailed: 'Failed to load trend data',
-            noData: 'No traffic in the last {days} days',
+            noData: 'No traffic in the last {days} day | No traffic in the last {days} days',
         },
         shareBar: {
             title: 'Share of total traffic',
@@ -276,9 +276,9 @@ export default {
         stats: {
             total: {
                 hour: '24h total',
-                day: '{count}-day total',
-                month: '{count}-month total',
-                year: '{count}-year total',
+                day: 'Total over {count} day | Total over {count} days',
+                month: 'Total over {count} month | Total over {count} months',
+                year: 'Total over {count} year | Total over {count} years',
             },
             compareLabel: 'vs previous period',
         },
@@ -308,8 +308,9 @@ export default {
         },
         insights: {
             day: {
-                avgWithCompare: 'Daily avg over the last {days} days: {avg}, {change}% vs the prior {days} days',
-                avgOnly: 'Daily avg over the last {days} days: {avg}',
+                avgWithCompare:
+                    'Daily avg over the last {days} day: {avg}, {change}% vs the prior {days} day | Daily avg over the last {days} days: {avg}, {change}% vs the prior {days} days',
+                avgOnly: 'Daily avg over the last {days} day: {avg} | Daily avg over the last {days} days: {avg}',
                 peak: 'Peak day {date} ({size})',
             },
             hour: {
@@ -370,7 +371,7 @@ export default {
             rxLabel: 'RX',
             txLabel: 'TX',
             todayTotal: "Today's total",
-            samplesSuffix: 'samples',
+            samples: '{count} sample | {count} samples',
         },
         compact: {
             title: 'Last 24 hours',
@@ -402,7 +403,7 @@ export default {
             at: 'at {time}',
             fiveMinTotal: '5-min total',
             uptime: 'Uptime',
-            days: '{count} days',
+            days: '{count} day | {count} days',
             since: 'since {date}',
             monthlyTotal: 'This month / total',
             today: 'today',

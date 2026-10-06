@@ -1,4 +1,5 @@
 import type { TrafficItem } from '@/types/network';
+import { formatDecimal } from '@/utils/numbers';
 
 /** Maximum number of ranks displayed in the ranking bar chart */
 export const CHART_TOP_N = 10;
@@ -22,5 +23,5 @@ export function peakSharePercent(items: readonly TrafficLike[]): string {
     const totals = items.map((item) => (item.rx ?? 0) + (item.tx ?? 0));
     const total = totals.reduce((sum, value) => sum + value, 0);
     const peak = Math.max(...totals);
-    return total > 0 ? ((peak / total) * 100).toFixed(1) + '%' : '0%';
+    return total > 0 ? formatDecimal((peak / total) * 100, 1) + '%' : '0%';
 }

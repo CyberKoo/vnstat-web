@@ -11,21 +11,26 @@ import esES from '@/locales/es-ES';
 
 import type { AppLocale } from '@/config/locales';
 
+const russianPluralRules = new Intl.PluralRules('ru-RU');
+
 /**
- * Global i18n instance.
- *
- * `legacy: false` enables the Composition API (`useI18n` / `$t` in templates).
- * `missingWarn` is silenced because the migration is incremental: views that
- * have not been converted yet keep their inline copy, and a missing key should
- * not spam the console while that is the case.
+ * Global Composition API instance; missing translations warn in development.
+ * Count messages use t(key, { count: formattedCount }, numericCount) so display
+ * formatting does not affect plural selection. Russian branches are one/few/many/other.
  */
 export const i18n = createI18n({
     legacy: false,
     globalInjection: true,
     locale: DEFAULT_LOCALE,
     fallbackLocale: DEFAULT_LOCALE,
-    missingWarn: false,
-    fallbackWarn: false,
+    missingWarn: import.meta.env.DEV,
+    fallbackWarn: import.meta.env.DEV,
+    pluralRules: {
+        'ru-RU': (count) => {
+            const category = russianPluralRules.select(count);
+            return category === 'one' ? 0 : category === 'few' ? 1 : category === 'many' ? 2 : 3;
+        },
+    },
     messages: {
         'zh-CN': zhCN,
         'zh-HK': zhHK,

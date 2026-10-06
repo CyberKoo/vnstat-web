@@ -17,7 +17,7 @@
         <li v-for="seg in segments" :key="seg.name" class="ov-share-legend-item">
             <span class="ov-share-dot" :style="{ background: seg.color }" />
             <span class="ov-share-name">{{ seg.name }}</span>
-            <span class="ov-share-pct">{{ seg.percent.toFixed(1) }}%</span>
+            <span class="ov-share-pct">{{ formatDecimal(seg.percent, 1) }}%</span>
         </li>
     </ul>
 </template>
@@ -28,6 +28,7 @@ import { useI18n } from 'vue-i18n';
 
 import { interfaceCategoryColor } from '@/components/overview/interfaceColors';
 import { formatBytes } from '@/utils/bytes';
+import { formatDecimal } from '@/utils/numbers';
 import type { InterfaceSummary } from '@/types/network';
 
 /**
@@ -72,7 +73,7 @@ const totalFormatted = computed(() => formatBytes(grandTotal.value).formatted);
 
 /** Accessibility description: each interface's share text joined together */
 const barAriaLabel = computed(() =>
-    segments.value.map((seg) => `${seg.name} ${seg.percent.toFixed(1)}%`).join(ariaSeparator.value),
+    segments.value.map((seg) => `${seg.name} ${formatDecimal(seg.percent, 1)}%`).join(ariaSeparator.value),
 );
 </script>
 

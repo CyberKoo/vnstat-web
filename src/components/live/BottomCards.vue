@@ -14,13 +14,13 @@
                     <div class="s2-pps-row">
                         <span class="s2-pps-dot s2-pps-dot--rx" />
                         <span class="s2-pps-dir">{{ t('common.rx') }}</span>
-                        <span class="mono s2-pps-val">{{ ppsStats.rx.toLocaleString() }}</span>
+                        <span class="mono s2-pps-val">{{ formatNumber(ppsStats.rx, { useGrouping: true }) }}</span>
                         <span class="s2-pps-pct">{{ ppsStats.rxPct }}%</span>
                     </div>
                     <div class="s2-pps-row">
                         <span class="s2-pps-dot s2-pps-dot--tx" />
                         <span class="s2-pps-dir">{{ t('common.tx') }}</span>
-                        <span class="mono s2-pps-val">{{ ppsStats.tx.toLocaleString() }}</span>
+                        <span class="mono s2-pps-val">{{ formatNumber(ppsStats.tx, { useGrouping: true }) }}</span>
                         <span class="s2-pps-pct">{{ ppsStats.txPct }}%</span>
                     </div>
                 </div>
@@ -68,6 +68,7 @@ import { useI18n } from 'vue-i18n';
 import { Doughnut, Bar } from '@/plugins/chartjs';
 import type { ChartData, ChartOptions } from 'chart.js';
 import { formatBytes } from '@/utils/bytes';
+import { formatNumber } from '@/utils/numbers';
 import { useDayjs } from '@/composables/useDayjs';
 
 const { t } = useI18n();

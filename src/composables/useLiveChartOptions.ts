@@ -3,6 +3,7 @@ import { useI18n } from 'vue-i18n';
 import type { ChartOptions } from 'chart.js';
 import type { InterfaceLinkSpeed, TimedNetworkStats, VnstatInterfaceDetail } from '@/types/network';
 import { formatBytes } from '@/utils/bytes';
+import { formatNumber } from '@/utils/numbers';
 import { BITS_PER_BYTE, BITS_PER_MBIT } from '@/constants';
 import { LINK_SPEED } from '@/config';
 import { palette } from '@/config/colors';
@@ -51,14 +52,22 @@ export function useLiveChartOptions(
         plugins: {
             legend: { display: false },
             tooltip: {
-                callbacks: { label: (ctx) => t('live.bottom.ppsTooltip', { label: ctx.label, value: ctx.parsed }) },
+                callbacks: {
+                    label: (ctx) =>
+                        t('live.bottom.ppsTooltip', {
+                            label: ctx.label,
+                            value: formatNumber(ctx.parsed, { useGrouping: true }),
+                        }),
+                },
             },
         },
     };
 
     const ppsTotal = computed(() => {
         const stats = latestTraffic.value?.stats;
-        return ((stats?.rx?.packetspersecond ?? 0) + (stats?.tx?.packetspersecond ?? 0)).toLocaleString();
+        return formatNumber((stats?.rx?.packetspersecond ?? 0) + (stats?.tx?.packetspersecond ?? 0), {
+            useGrouping: true,
+        });
     });
 
     /** PPS and share of receive / send respectively (for the breakdown legend next to the doughnut) */

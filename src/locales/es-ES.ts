@@ -68,11 +68,11 @@ export default {
             ariaReached: '{percent}% de la media diaria alcanzado',
         },
         trend: {
-            title: 'Todas las interfaces · últimos {days} días',
+            title: 'Todas las interfaces · periodo de {days} día | Todas las interfaces · últimos {days} días',
             rx: 'RX',
             tx: 'TX',
             loadFailed: 'Error al cargar la tendencia',
-            noData: 'Sin tráfico en los últimos {days} días',
+            noData: 'Sin tráfico en un periodo de {days} día | Sin tráfico en los últimos {days} días',
         },
         shareBar: {
             title: 'Distribución del tráfico total',
@@ -213,7 +213,7 @@ export default {
         trafficWithUnit: 'Tráfico ({unit})',
         ghostLine: 'Periodo anterior',
         avgLine: 'Media histórica',
-        movingAverage: 'Media móvil de {days} días',
+        movingAverage: 'Media móvil de {days} día | Media móvil de {days} días',
         lastWeek: 'Mismo día de la semana pasada',
         rxCumulative: 'RX acumulado',
         txCumulative: 'TX acumulado',
@@ -278,9 +278,9 @@ export default {
         stats: {
             total: {
                 hour: 'Total 24 h',
-                day: 'Total de {count} días',
-                month: 'Total de {count} meses',
-                year: 'Total de {count} años',
+                day: 'Total de {count} día | Total de {count} días',
+                month: 'Total de {count} mes | Total de {count} meses',
+                year: 'Total de {count} año | Total de {count} años',
             },
             compareLabel: 'vs. periodo anterior',
         },
@@ -311,8 +311,9 @@ export default {
         insights: {
             day: {
                 avgWithCompare:
-                    'Media diaria de los últimos {days} días: {avg}, {change}% vs. los {days} días anteriores',
-                avgOnly: 'Media diaria de los últimos {days} días: {avg}',
+                    'Media diaria del periodo de {days} día: {avg}, {change}% vs. el periodo anterior de {days} día | Media diaria de los últimos {days} días: {avg}, {change}% vs. los {days} días anteriores',
+                avgOnly:
+                    'Media diaria del periodo de {days} día: {avg} | Media diaria de los últimos {days} días: {avg}',
                 peak: 'Día pico {date} ({size})',
             },
             hour: {
@@ -342,10 +343,10 @@ export default {
             thisMonth: 'Este mes',
             used: '{month}: {used} / {quota} GiB · {percent}%',
             notSet: 'Sin cuota mensual de tráfico definida',
-            adjust: 'Ajustar cuota',
-            set: 'Definir cuota',
+            adjust: 'Ajustar cuota de tráfico',
+            set: 'Definir cuota de tráfico',
             panelTitle: 'Cuota mensual de tráfico',
-            inputLabel: 'Importe de la cuota mensual',
+            inputLabel: 'Cantidad de tráfico mensual',
             placeholder: 'Deja en blanco para quitar la cuota',
             clear: 'Borrar',
             stateSet: 'Definida en {quota} GiB',
@@ -374,7 +375,7 @@ export default {
             rxLabel: 'RX',
             txLabel: 'TX',
             todayTotal: 'Total de hoy',
-            samplesSuffix: 'muestras',
+            samples: '{count} muestra | {count} muestras',
         },
         compact: {
             title: 'Últimas 24 horas',
@@ -395,7 +396,7 @@ export default {
             replaying: 'Repitiendo',
             replayTag: 'Repetición',
             historyTag: '48h',
-            exitReplay: 'Volver a en directo',
+            exitReplay: 'Volver al modo en directo',
             replayTimeline: 'Línea de tiempo de repetición',
             liveTag: 'En directo',
             connecting: 'Conectando…',
@@ -406,7 +407,7 @@ export default {
             at: 'a las {time}',
             fiveMinTotal: 'Total de 5 min',
             uptime: 'Tiempo activo',
-            days: '{count} días',
+            days: '{count} día | {count} días',
             since: 'desde el {date}',
             monthlyTotal: 'Este mes / total',
             today: 'hoy',

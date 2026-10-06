@@ -1,4 +1,5 @@
 import type { ByteUnit, RateUnit } from '@/constants';
+import { formatDecimal } from '@/utils/numbers';
 import {
     BITS_PER_BYTE,
     BITS_PER_KBIT,
@@ -15,7 +16,7 @@ import {
 export interface ByteFormatResult {
     /** Raw byte count */
     raw: number;
-    /** Scaled numeric string */
+    /** Locale-independent scaled numeric string (safe to parse) */
     value: string;
     /** Formatted string (with unit and truncation) */
     formatted: string;
@@ -67,7 +68,7 @@ export function formatBytes(bytes: number | undefined, fixed = 2): ByteFormatRes
     return {
         raw: bytes,
         value: value.toFixed(fixed),
-        formatted: `${value.toFixed(fixed)} ${BYTE_UNITS[exponent]}`,
+        formatted: `${formatDecimal(value, fixed)} ${BYTE_UNITS[exponent]}`,
         unit: BYTE_UNITS[exponent],
         exponent,
     };
@@ -125,7 +126,7 @@ function formatBitRate(bits: number, interval: number, fixed: number): Omit<Rate
 
     return {
         value: displayValue,
-        formatted: `${displayValue} ${unit}`,
+        formatted: `${value >= 1 ? formatDecimal(value / Math.pow(BITS_PER_KBIT, unitIndex), fixed) : '0'} ${unit}`,
         unit,
     };
 }
@@ -138,8 +139,8 @@ function formatBitRate(bits: number, interval: number, fixed: number): Omit<Rate
  * @returns Formatted string, e.g. "5 MiB/s", "1023 KiB/s", "1.23 MiB/s"
  */
 export function formatByteRate(v: number, fixed: number = 0): string {
-    if (v >= BYTES_IN_GIB) return (v / BYTES_IN_GIB).toFixed(fixed) + ' GiB/s';
-    if (v >= BYTES_IN_MIB) return (v / BYTES_IN_MIB).toFixed(fixed) + ' MiB/s';
-    if (v >= BYTES_IN_KIB) return (v / BYTES_IN_KIB).toFixed(fixed) + ' KiB/s';
-    return v.toFixed(fixed) + ' B/s';
+    if (v >= BYTES_IN_GIB) return formatDecimal(v / BYTES_IN_GIB, fixed) + ' GiB/s';
+    if (v >= BYTES_IN_MIB) return formatDecimal(v / BYTES_IN_MIB, fixed) + ' MiB/s';
+    if (v >= BYTES_IN_KIB) return formatDecimal(v / BYTES_IN_KIB, fixed) + ' KiB/s';
+    return formatDecimal(v, fixed) + ' B/s';
 }

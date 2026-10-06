@@ -26,7 +26,7 @@
                     <div class="s2-year-card-share-rx" :style="{ width: `${card.rxShare * 100}%` }" />
                 </div>
                 <span class="s2-year-card-share-label">{{
-                    t('chart.yearCard.rxShare', { percent: (card.rxShare * 100).toFixed(1) })
+                    t('chart.yearCard.rxShare', { percent: formatDecimal(card.rxShare * 100, 1) })
                 }}</span>
             </div>
             <!-- Mini month bars (button-like: one Tab stop for all cards, arrows walk the bars) -->
@@ -71,6 +71,7 @@ import { useDayjs } from '@/composables/useDayjs';
 import { useCellTooltip } from '@/composables/useCellTooltip';
 import { useRovingCells } from '@/composables/useRovingCells';
 import { formatBytes } from '@/utils/bytes';
+import { formatDecimal } from '@/utils/numbers';
 
 const props = defineProps<{
     /** Year comparison cards (built by buildYearCards, ascending by year) */
@@ -85,7 +86,7 @@ const currentMonthIdx = new Date().getMonth();
 
 /** Signed percent text for the year-over-year figure (e.g. "+12.3%" / "-4.0%") */
 function yoyText(pct: number): string {
-    return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`;
+    return `${pct >= 0 ? '+' : ''}${formatDecimal(pct, 1)}%`;
 }
 
 /** Localized short month name (dayjs "MMM", e.g. "Jan" in English), following the UI language */

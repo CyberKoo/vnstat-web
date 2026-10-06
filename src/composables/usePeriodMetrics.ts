@@ -19,6 +19,7 @@ import {
     useTrendColor,
 } from '@/composables/useTrafficStats';
 import { formatBytes } from '@/utils/bytes';
+import { formatDecimal, formatNumber } from '@/utils/numbers';
 import { formatTimestamp } from '@/utils/datetime';
 import type { TrafficStatItem } from '@/types/chart';
 
@@ -75,7 +76,7 @@ export function usePeriodMetrics(data: PeriodDataContext): PeriodMetrics {
         const totalLabel =
             config.dataField === 'hour'
                 ? t('period.stats.total.hour')
-                : t(`period.stats.total.${config.dataField}`, { count: 0 });
+                : t(`period.stats.total.${config.dataField}`, { count: formatNumber(0) }, 0);
         const cards: TrafficStatItem[] = [{ value: '0 B', label: totalLabel, color: 'var(--brand)' }];
         if (config.hasAvgCard) {
             cards.push({ value: '0 B', label: t(`periods.${period}.avg`), color: 'var(--tx)' });
@@ -124,7 +125,7 @@ export function usePeriodMetrics(data: PeriodDataContext): PeriodMetrics {
         const totalLabel =
             config.dataField === 'hour'
                 ? t('period.stats.total.hour')
-                : t(`period.stats.total.${config.dataField}`, { count });
+                : t(`period.stats.total.${config.dataField}`, { count: formatNumber(count) }, count);
         cards.push({
             value: formatBytes(totalBytes).formatted,
             label: totalLabel,
@@ -208,7 +209,7 @@ export function usePeriodMetrics(data: PeriodDataContext): PeriodMetrics {
             total: formatBytes(total).formatted,
             avg: formatBytes(Math.round(total / items.length)).formatted,
             peak: peak.label + ' ' + formatBytes(peak.val).formatted,
-            rxPercent: total > 0 ? ((totalRx / total) * 100).toFixed(1) + '%' : '0%',
+            rxPercent: total > 0 ? formatDecimal((totalRx / total) * 100, 1) + '%' : '0%',
         };
     });
 
@@ -221,7 +222,7 @@ export function usePeriodMetrics(data: PeriodDataContext): PeriodMetrics {
         if (config.dataField === 'hour') {
             rows.push({
                 label: t(config.sideAvgLabelKey),
-                value: t('period.side.duration', { count: statsLimit.value }),
+                value: t('period.side.duration', { count: formatNumber(statsLimit.value) }, statsLimit.value),
             });
         } else {
             rows.push({ label: t(config.sideAvgLabelKey), value: sideStats.value.avg });

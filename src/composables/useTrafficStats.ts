@@ -1,6 +1,7 @@
 import { computed, type Ref } from 'vue';
 import { palette } from '@/config/colors';
 import type { TrafficItem } from '@/types/network';
+import { formatDecimal } from '@/utils/numbers';
 
 /**
  * Trend calculation result.
@@ -28,7 +29,7 @@ export function computeTrend(currentTotal: number, previousTotal: number): Trend
     if (previousTotal > 0) {
         const diff = ((currentTotal - previousTotal) / previousTotal) * 100;
         return {
-            trendPercent: `${diff >= 0 ? '+' : ''}${diff.toFixed(1)}%`,
+            trendPercent: `${diff >= 0 ? '+' : ''}${formatDecimal(diff, 1)}%`,
             trendIcon: diff >= 0 ? '↑' : '↓',
             trendType: diff > 5 ? 'error' : diff < -5 ? 'success' : 'default',
         };

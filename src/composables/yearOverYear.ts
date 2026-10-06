@@ -9,6 +9,7 @@ import type { ChartTheme } from '@/types/chart';
 import type { TrafficItem } from '@/types/network';
 import { createAdaptiveBarChartOptions } from '@/utils/chartOptions';
 import { formatBytes } from '@/utils/bytes';
+import { formatDecimal } from '@/utils/numbers';
 
 // ── Model ──
 
@@ -200,7 +201,7 @@ export function buildYearOverYearChartOptions(input: YearOverYearChartOptionsInp
                                 lines.push(
                                     i18n.global.t('chart.yoy.changeTip', {
                                         year: model.years[prev.datasetIndex],
-                                        percent: `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`,
+                                        percent: `${pct >= 0 ? '+' : ''}${formatDecimal(pct, 1)}%`,
                                     }),
                                 );
                             }

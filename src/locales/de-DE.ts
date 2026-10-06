@@ -1,7 +1,7 @@
 /**
  * German (Deutsch, de-DE) message catalog.
  *
- * Key structure must stay in sync with `zh-CN.ts` (which is the source of truth).
+ * Key structure and interpolation parameters must stay in sync across all catalogs.
  *
  * Notes on structure:
  * - Composed sentences are whole messages with parameters; German word order
@@ -68,11 +68,11 @@ export default {
             ariaReached: '{percent} % des Tagesdurchschnitts erreicht',
         },
         trend: {
-            title: 'Alle Schnittstellen · letzte {days} Tage',
+            title: 'Alle Schnittstellen · Zeitraum von {days} Tag | Alle Schnittstellen · letzte {days} Tage',
             rx: 'RX',
             tx: 'TX',
             loadFailed: 'Trenddaten konnten nicht geladen werden',
-            noData: 'Kein Traffic in den letzten {days} Tagen',
+            noData: 'Kein Traffic im Zeitraum von {days} Tag | Kein Traffic in den letzten {days} Tagen',
         },
         shareBar: {
             title: 'Anteil am Gesamt-Traffic',
@@ -212,7 +212,7 @@ export default {
         trafficWithUnit: 'Traffic ({unit})',
         ghostLine: 'Vorherige Periode',
         avgLine: 'Historischer Durchschnitt',
-        movingAverage: '{days}-Tage-Durchschnitt',
+        movingAverage: 'Gleitender Durchschnitt über {days} Tag | Gleitender Durchschnitt über {days} Tage',
         lastWeek: 'Gleicher Wochentag letzte Woche',
         rxCumulative: 'RX kumulativ',
         txCumulative: 'TX kumulativ',
@@ -277,9 +277,9 @@ export default {
         stats: {
             total: {
                 hour: '24-h-Gesamt',
-                day: '{count}-Tage-Gesamt',
-                month: '{count}-Monate-Gesamt',
-                year: '{count}-Jahre-Gesamt',
+                day: 'Gesamt über {count} Tag | Gesamt über {count} Tage',
+                month: 'Gesamt über {count} Monat | Gesamt über {count} Monate',
+                year: 'Gesamt über {count} Jahr | Gesamt über {count} Jahre',
             },
             compareLabel: 'ggü. vorheriger Periode',
         },
@@ -310,8 +310,9 @@ export default {
         insights: {
             day: {
                 avgWithCompare:
-                    'Tagesdurchschnitt der letzten {days} Tage: {avg}, {change} % ggü. den vorherigen {days} Tagen',
-                avgOnly: 'Tagesdurchschnitt der letzten {days} Tage: {avg}',
+                    'Tagesdurchschnitt im Zeitraum von {days} Tag: {avg}, {change} % ggü. dem vorherigen Zeitraum von {days} Tag | Tagesdurchschnitt der letzten {days} Tage: {avg}, {change} % ggü. den vorherigen {days} Tagen',
+                avgOnly:
+                    'Tagesdurchschnitt im Zeitraum von {days} Tag: {avg} | Tagesdurchschnitt der letzten {days} Tage: {avg}',
                 peak: 'Spitzentag {date} ({size})',
             },
             hour: {
@@ -373,7 +374,7 @@ export default {
             rxLabel: 'RX',
             txLabel: 'TX',
             todayTotal: 'Gesamt heute',
-            samplesSuffix: 'Werte',
+            samples: '{count} Messwert | {count} Messwerte',
         },
         compact: {
             title: 'Letzte 24 Stunden',
@@ -405,7 +406,7 @@ export default {
             at: 'um {time}',
             fiveMinTotal: '5-Min-Gesamt',
             uptime: 'Laufzeit',
-            days: '{count} Tage',
+            days: '{count} Tag | {count} Tage',
             since: 'seit {date}',
             monthlyTotal: 'Dieser Monat / gesamt',
             today: 'heute',

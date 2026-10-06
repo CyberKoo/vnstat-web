@@ -1,6 +1,14 @@
-import { describe, expect, it, vi } from 'vitest';
-import { ref } from 'vue';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { nextTick, ref } from 'vue';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import { createTestingPinia } from '@pinia/testing';
 import type uPlot from 'uplot';
+
+import RealTimeLine from '@/components/live/RealTimeLine.vue';
+import * as uplotConfig from '@/composables/uplotConfig';
+import { i18n } from '@/plugins/i18n';
+import type { ReplayWindow } from '@/composables/replayWindow';
+import type { TimedNetworkStats } from '@/types/network';
 
 import { buildOpts, getColors, rxShare, sideSpan, sideTicks } from '@/composables/uplotConfig';
 import type { UplotOverlay } from '@/composables/uplotConfig';
@@ -90,6 +98,145 @@ describe('sideTicks', () => {
             expect(ticks.length).toBeLessThanOrEqual(4);
         }
     });
+});
+
+describe('localized chart times with unchanged data', () => {
+    const originalLocale = i18n.global.locale.value;
+    let wrapper: VueWrapper | undefined;
+
+    afterEach(() => {
+        wrapper?.unmount();
+        wrapper = undefined;
+        i18n.global.locale.value = originalLocale;
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
+    });
+
+    it.each([false, true])(
+        'refreshes real uPlot axis caches and a pinned tooltip (replay = %s)',
+        async (replayMode) => {
+            i18n.global.locale.value = 'zh-CN';
+            // Keep the real uPlot lifecycle/axis cache; stub only the unavailable canvas drawing APIs.
+            const fillText = vi.fn();
+            const noop = () => {};
+            const ctx = new Proxy(
+                {
+                    fillText,
+                    measureText: (text: string) => ({ width: text.length * 6 }),
+                    createLinearGradient: () => ({ addColorStop: noop }),
+                },
+                { get: (target, key) => Reflect.get(target, key) ?? noop },
+            );
+            vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
+                ctx as unknown as CanvasRenderingContext2D,
+            );
+            vi.stubGlobal(
+                'Path2D',
+                class {
+                    constructor() {
+                        return new Proxy(this, { get: () => noop });
+                    }
+                },
+            );
+            // No animation callbacks or new samples are needed for the language refresh.
+            const requestFrame = vi.fn(() => 1);
+            vi.stubGlobal('requestAnimationFrame', requestFrame);
+            vi.stubGlobal('cancelAnimationFrame', vi.fn());
+            vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+                x: 0,
+                y: 0,
+                top: 0,
+                left: 0,
+                bottom: 300,
+                right: 600,
+                width: 600,
+                height: 300,
+                toJSON: () => ({}),
+            });
+
+            let plot!: uPlot;
+            const realBuildOpts = uplotConfig.buildOpts;
+            const buildSpy = vi.spyOn(uplotConfig, 'buildOpts').mockImplementation((params) => {
+                const opts = realBuildOpts(params);
+                opts.hooks!.ready!.push((self) => {
+                    plot = self;
+                });
+                return opts;
+            });
+            const ts = new Date(2026, 9, 5, 13, 2, 3).getTime() / 1e3;
+            const replay: ReplayWindow = {
+                x: [ts - 60, ts, ts + 60],
+                rx: [100, 100, 100],
+                tx: [50, 50, 50],
+                centerIdx: 1,
+                centerTs: ts,
+            };
+            wrapper = mount(RealTimeLine, {
+                props: { latestTraffic: null, isDark: false, replay: replayMode ? replay : null },
+                global: { plugins: [i18n, createTestingPinia({ createSpy: vi.fn })] },
+            });
+            await nextTick();
+            await Promise.resolve();
+            expect(plot).toBeDefined();
+            const timestamp = replayMode ? ts : Date.now() / 1e3;
+            await wrapper.setProps({
+                latestTraffic: {
+                    timestamp: timestamp * 1e3,
+                    stats: { rx: { bytespersecond: 100 }, tx: { bytespersecond: 50 } },
+                } as TimedNetworkStats,
+            });
+            await Promise.resolve();
+            plot.setCursor({ left: plot.valToPos(timestamp, 'x'), top: 30 });
+            const tooltip = () => plot.over.querySelector('.u-tt-time')!.textContent;
+            const axisValues = () => (plot.axes[0] as uPlot.Axis & { _values: string[] })._values;
+
+            if (replayMode) {
+                expect(axisValues()).toEqual(['13:01', '13:01', '13:02', '13:03']);
+                expect(tooltip()).toBe('13:02:03');
+            } else {
+                expect(axisValues()).toContain('现在');
+            }
+            const data = plot.data;
+            const dataSnapshot = data.map((series) => Array.from(series));
+            const min = plot.scales.x.min;
+            const max = plot.scales.x.max;
+            const setData = vi.spyOn(plot, 'setData');
+            const destroy = vi.spyOn(plot, 'destroy');
+            const oldTooltip = tooltip();
+            fillText.mockClear();
+
+            i18n.global.locale.value = 'en-US';
+            await nextTick();
+            await Promise.resolve();
+            if (replayMode) {
+                expect(axisValues()).toEqual(['1:01 PM', '1:01 PM', '1:02 PM', '1:03 PM']);
+                expect(tooltip()).toBe('1:02:03 PM');
+                expect(fillText).toHaveBeenCalledWith('1:02 PM', expect.any(Number), expect.any(Number));
+            } else {
+                expect(axisValues()).toContain('now');
+                expect(tooltip()).not.toBe(oldTooltip);
+                expect(tooltip()).toMatch(/ (AM|PM)$/);
+            }
+            expect(plot.over.querySelector('.u-axis-label.rx')!.textContent).toBe('RX');
+            expect(plot.over.querySelector('.u-axis-label.tx')!.textContent).toBe('TX');
+            expect(plot.data).toBe(data);
+            expect(plot.data.map((series) => Array.from(series))).toEqual(dataSnapshot);
+            expect(plot.scales.x.min).toBe(min);
+            expect(plot.scales.x.max).toBe(max);
+            expect(setData).not.toHaveBeenCalled();
+            expect(destroy).not.toHaveBeenCalled();
+            expect(buildSpy).toHaveBeenCalledTimes(1);
+            expect(requestFrame).toHaveBeenCalledTimes(1);
+
+            if (replayMode) {
+                // SSE received during replay remains buffered and available after the locale switch.
+                await wrapper.setProps({ replay: null });
+                await Promise.resolve();
+                expect(plot.data[0][0]).toBe(timestamp);
+                expect(axisValues()).toContain('now');
+            }
+        },
+    );
 });
 
 describe('touch listener lifecycle', () => {

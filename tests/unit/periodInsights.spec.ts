@@ -7,15 +7,10 @@ import { projectMonthEnd } from '@/composables/useMonthlyQuota';
 import { formatBytes } from '@/utils/bytes';
 import type { TrafficItem } from '@/types/network';
 
-/**
- * Resolve the same i18n message key the implementation uses.
- *
- * The migration is incremental: before the new keys land in the message catalogs t() returns the
- * key itself, so asserting against t() of the same key with the same parameters holds both
- * pre-merge (key string on both sides) and post-merge (the real translated message).
- */
+/** Resolve translated expectations, selecting the same quantity branch as the displayed window. */
 function msg(key: string, named?: Record<string, unknown>): string {
-    return named ? i18n.global.t(key, named) : i18n.global.t(key);
+    if (!named) return i18n.global.t(key);
+    return typeof named.days === 'number' ? i18n.global.t(key, named, named.days) : i18n.global.t(key, named);
 }
 
 /** Build one traffic record for the given date (local midnight) */

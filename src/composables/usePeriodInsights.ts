@@ -5,6 +5,7 @@ import { buildHourlyProfile } from '@/composables/useHourlyProfile';
 import { projectMonthEnd } from '@/composables/useMonthlyQuota';
 import { computeTotalBytes, findPeak } from '@/composables/useTrafficStats';
 import { formatBytes } from '@/utils/bytes';
+import { formatDecimal, formatNumber } from '@/utils/numbers';
 import type { TrafficItem } from '@/types/network';
 import type { PeriodType } from '@/config/trafficPeriods';
 
@@ -66,20 +67,21 @@ function buildDayInsights(items: TrafficItem[], allItems: TrafficItem[]): string
         const prevAvg = prev ? computeTotalBytes(prev) / prev.length : null;
         if (prevAvg !== null && prevAvg > 0) {
             const pct = ((avg - prevAvg) / prevAvg) * 100;
-            const change = `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}`;
+            const change = `${pct >= 0 ? '+' : ''}${formatDecimal(pct, 1)}`;
             out.push(
-                i18n.global.t('period.insights.day.avgWithCompare', {
-                    days: recent.length,
-                    avg: formatBytes(avg, 1).formatted,
-                    change,
-                }),
+                i18n.global.t(
+                    'period.insights.day.avgWithCompare',
+                    { days: formatNumber(recent.length), avg: formatBytes(avg, 1).formatted, change },
+                    recent.length,
+                ),
             );
         } else {
             out.push(
-                i18n.global.t('period.insights.day.avgOnly', {
-                    days: recent.length,
-                    avg: formatBytes(avg, 1).formatted,
-                }),
+                i18n.global.t(
+                    'period.insights.day.avgOnly',
+                    { days: formatNumber(recent.length), avg: formatBytes(avg, 1).formatted },
+                    recent.length,
+                ),
             );
         }
     }
@@ -136,7 +138,7 @@ function buildHourInsights(items: TrafficItem[], allItems: TrafficItem[], format
                 out.push(
                     i18n.global.t('period.insights.hour.peakSingle', {
                         start: `${top[0]}:00`,
-                        share: share.toFixed(0),
+                        share: formatDecimal(share, 0),
                     }),
                 );
             } else {
@@ -144,7 +146,7 @@ function buildHourInsights(items: TrafficItem[], allItems: TrafficItem[], format
                     i18n.global.t('period.insights.hour.peakBand', {
                         start: `${top[0]}:00`,
                         end: `${top[top.length - 1]}:00`,
-                        share: share.toFixed(0),
+                        share: formatDecimal(share, 0),
                     }),
                 );
             }
@@ -161,14 +163,14 @@ function buildHourInsights(items: TrafficItem[], allItems: TrafficItem[], format
                 i18n.global.t('period.insights.hour.recentWithSpeed', {
                     total: formatBytes(recentTotal, 1).formatted,
                     speed: avgSpeed,
-                    ratio: ratio.toFixed(1),
+                    ratio: formatDecimal(ratio, 1),
                 }),
             );
         } else {
             out.push(
                 i18n.global.t('period.insights.hour.recent', {
                     total: formatBytes(recentTotal, 1).formatted,
-                    ratio: ratio.toFixed(1),
+                    ratio: formatDecimal(ratio, 1),
                 }),
             );
         }
@@ -233,7 +235,7 @@ function buildYearInsights(items: TrafficItem[]): string[] {
     const curYear = dayjs.unix(cur.timestamp).format('YYYY');
     if (prevTotal > 0) {
         const pct = ((curTotal - prevTotal) / prevTotal) * 100;
-        const change = `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}`;
+        const change = `${pct >= 0 ? '+' : ''}${formatDecimal(pct, 1)}`;
         return [
             i18n.global.t('period.insights.year.compare', {
                 year: curYear,

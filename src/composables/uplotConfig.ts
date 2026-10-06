@@ -3,6 +3,7 @@ import uPlot from 'uplot';
 
 import { palette } from '@/config/colors';
 import { i18n } from '@/plugins/i18n';
+import dayjs from '@/plugins/dayjs';
 import { hexToRgba } from '@/utils/color';
 
 // ── Types ──
@@ -214,10 +215,9 @@ export function sideTicks(span: number, step: number): number[] {
     return out;
 }
 
-/** Format a timestamp (seconds) as HH:mm (local time zone) */
+/** Format a timestamp (seconds) in the active language (local time zone). */
 function fmtHM(tsSec: number): string {
-    const d = new Date(tsSec * 1e3);
-    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    return dayjs.unix(tsSec).format(i18n.global.t('common.format.time'));
 }
 
 /**
@@ -480,7 +480,7 @@ export function buildOpts(params: BuildOptsParams): uPlot.Options {
         mode: 1,
         // Mobile: the x tick labels are centered on the plot bounds and the auto side padding is 0
         // on the left (only sides without axes get auto padding), so the first label ("-60s", or
-        // "HH:mm" in replay) is clipped by the canvas edge — reserve room for half a label
+        // a localized time in replay) is clipped by the canvas edge — reserve room for half a label
         padding: isMobile ? [null, null, null, 18] : undefined,
         cursor: {
             show: true,
@@ -509,7 +509,7 @@ export function buildOpts(params: BuildOptsParams): uPlot.Options {
                 // bottom of the time labels
                 size: 30,
                 // Evenly spaced ticks: relative seconds in realtime mode (sliding with the window),
-                // HH:mm in replay mode
+                // localized time in replay mode
                 splits: (_self: uPlot, _axisIdx: number, scaleMin: number | null, scaleMax: number | null) => {
                     const min = scaleMin ?? 0;
                     const max = scaleMax ?? 0;
@@ -653,8 +653,7 @@ export function buildOpts(params: BuildOptsParams): uPlot.Options {
                             }
 
                             const top = self.cursor.top ?? 0;
-                            const d = new Date(xVal * 1e3);
-                            ttTime.textContent = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+                            ttTime.textContent = dayjs.unix(xVal).format(i18n.global.t('common.format.timeSeconds'));
                             // Data is normalized by span and share; convert back to the real rate
                             const ov = getOverlay();
                             const rxReal = rxVal != null && ov.yShare > 0 ? (rxVal / ov.yShare) * ov.rxSpan : null;

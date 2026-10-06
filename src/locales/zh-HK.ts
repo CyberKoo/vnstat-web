@@ -1,7 +1,7 @@
 /**
  * Traditional Chinese (Hong Kong) message catalog.
  *
- * Key structure must stay in sync with `zh-CN.ts` (the source of truth).
+ * Key structure and interpolation parameters must stay in sync across all catalogs.
  * Phrasing follows Hong Kong UI conventions (介面 / 數據 / 載入 / 位元組),
  * and is the fallback target for every other Traditional Chinese variant
  * (zh-TW / zh-MO / any `zh-*-Hant` tag — see `resolveAppLocale`).
@@ -381,7 +381,7 @@ export default {
             rxLabel: '接收 · RX',
             txLabel: '傳送 · TX',
             todayTotal: '今日 · 累計',
-            samplesSuffix: '條採樣',
+            samples: '{count} 條採樣',
         },
         compact: {
             title: '24 小時概覽',

@@ -1,7 +1,7 @@
 <template>
     <!-- The s2-sheet-section wrapper is owned by the view, as on every other page -->
     <h2 class="s2-section-label">
-        {{ t('overview.trend.title', { days: windowDays }) }}
+        {{ t('overview.trend.title', { days: formatNumber(windowDays) }, windowDays) }}
         <span class="s2-section-hint ov-trend-legend">
             <span class="ov-trend-chip">
                 <i class="ov-trend-dot ov-trend-dot--rx" />{{ t('overview.trend.rx') }} {{ rxTotalFormatted }}
@@ -26,7 +26,9 @@
     </div>
 
     <!-- No traffic data in the last 30 days -->
-    <div v-else-if="!hasData" class="ov-trend-fallback">{{ t('overview.trend.noData', { days: windowDays }) }}</div>
+    <div v-else-if="!hasData" class="ov-trend-fallback">
+        {{ t('overview.trend.noData', { days: formatNumber(windowDays) }, windowDays) }}
+    </div>
 
     <div v-else class="s2-chart-box">
         <div :style="{ height: chartHeight + 'px' }">
@@ -46,6 +48,7 @@ import { AGGREGATE_WINDOW_DAYS, useAggregateTrend } from '@/composables/useAggre
 import { useDayjs } from '@/composables/useDayjs';
 import { useMobile } from '@/composables/useMobile';
 import { formatBytes } from '@/utils/bytes';
+import { formatNumber } from '@/utils/numbers';
 import { hexToRgba } from '@/utils/color';
 import { palette } from '@/config/colors';
 

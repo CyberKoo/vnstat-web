@@ -96,7 +96,7 @@
                             <span v-if="row.alias" class="muted s2-iface-alias">{{ row.alias }}</span>
                         </div>
                         <span class="ov-card-pct">{{
-                            t('overview.card.shareOfTotal', { percent: row.share.toFixed(1) })
+                            t('overview.card.shareOfTotal', { percent: formatDecimal(row.share, 1) })
                         }}</span>
                     </div>
                     <div v-if="row.spark === 'loading'" class="ov-card-spark">
@@ -168,6 +168,7 @@ import { SPARKLINE_MAX_INTERFACES, useInterfaceOverview } from '@/composables/us
 import { computeTodayRing, type TodayProgress, type TodayRingResult } from '@/composables/useTodayProgress';
 import { useSpeedFormat } from '@/composables/useSpeedFormat';
 import { formatBytes } from '@/utils/bytes';
+import { formatDecimal } from '@/utils/numbers';
 import { useDayjs } from '@/composables/useDayjs';
 import { useMobile } from '@/composables/useMobile';
 import AggregateTrendChart from '@/components/overview/AggregateTrendChart.vue';
