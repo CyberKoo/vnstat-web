@@ -91,17 +91,6 @@ export default {
         fetchFailed: '獲取介面概況數據失敗',
     },
 
-    /** Language names written in their own language (language switcher) */
-    localeNames: {
-        'zh-CN': '簡體中文',
-        'zh-HK': '繁體中文',
-        'en-US': 'English',
-        'ja-JP': '日語',
-        'ru-RU': '俄語',
-        'de-DE': '德語',
-        'es-ES': '西班牙語',
-    },
-
     /** Top bar */
     header: {
         switchLanguage: '切換語言',

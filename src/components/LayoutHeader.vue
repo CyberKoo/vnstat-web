@@ -96,12 +96,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { useSettingsStore } from '@/stores/settings';
 import { useLocaleStore } from '@/stores/locale';
-import { SUPPORTED_LOCALES, type AppLocale } from '@/config/locales';
+import { SUPPORTED_LOCALES, LOCALE_NATIVE_NAMES, type AppLocale } from '@/config/locales';
 import DropdownMenu from '@/components/ui/DropdownMenu.vue';
 
 const { t } = useI18n();
@@ -109,9 +108,8 @@ const { t } = useI18n();
 const settingsStore = useSettingsStore();
 const localeStore = useLocaleStore();
 
-const localeOptions = computed(() =>
-    SUPPORTED_LOCALES.map((locale) => ({ label: t(`localeNames.${locale}`), key: locale })),
-);
+/** The switcher shows each locale's own name, untranslated */
+const localeOptions = SUPPORTED_LOCALES.map((locale) => ({ label: LOCALE_NATIVE_NAMES[locale], key: locale }));
 
 function onSelectLocale(key: string) {
     localeStore.setLocale(key as AppLocale);

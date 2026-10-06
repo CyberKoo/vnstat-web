@@ -80,17 +80,6 @@ export default {
         fetchFailed: 'Failed to load interface overview',
     },
 
-    /** Language names written in their own language (language switcher) */
-    localeNames: {
-        'zh-CN': 'Simplified Chinese',
-        'zh-HK': 'Traditional Chinese',
-        'en-US': 'English',
-        'ja-JP': 'Japanese',
-        'ru-RU': 'Russian',
-        'de-DE': 'German',
-        'es-ES': 'Spanish',
-    },
-
     /** Top bar */
     header: {
         switchLanguage: 'Language',

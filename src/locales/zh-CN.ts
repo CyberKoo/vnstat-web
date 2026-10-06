@@ -89,17 +89,6 @@ export default {
         fetchFailed: '获取接口概况数据失败',
     },
 
-    /** Language names written in their own language (language switcher) */
-    localeNames: {
-        'zh-CN': '简体中文',
-        'zh-HK': '繁體中文',
-        'en-US': 'English',
-        'ja-JP': '日语',
-        'ru-RU': '俄语',
-        'de-DE': '德语',
-        'es-ES': '西班牙语',
-    },
-
     /** Top bar */
     header: {
         switchLanguage: '切换语言',

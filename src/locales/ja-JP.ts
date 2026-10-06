@@ -79,17 +79,6 @@ export default {
         fetchFailed: 'インターフェースの概要の読み込みに失敗しました',
     },
 
-    /** 言語名は各言語での表記（言語切り替えメニュー用） */
-    localeNames: {
-        'zh-CN': '簡体中国語',
-        'zh-HK': '繁体中国語',
-        'en-US': '英語',
-        'ja-JP': '日本語',
-        'ru-RU': 'ロシア語',
-        'de-DE': 'ドイツ語',
-        'es-ES': 'スペイン語',
-    },
-
     /** トップバー */
     header: {
         switchLanguage: '言語',

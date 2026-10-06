@@ -3,7 +3,7 @@
  *
  * Adding a language means: extend this tuple, add a matching catalog under
  * `src/locales/`, register it in `src/plugins/i18n.ts`, and map it to a
- * dayjs locale (see `LOCALE_DAYJS`).
+ * dayjs locale (see `LOCALE_DAYJS`) and a native name (see `LOCALE_NATIVE_NAMES`).
  */
 export const SUPPORTED_LOCALES = ['zh-CN', 'zh-HK', 'en-US', 'ja-JP', 'ru-RU', 'de-DE', 'es-ES'] as const;
 
@@ -21,6 +21,17 @@ export const LOCALE_DAYJS: Record<AppLocale, string> = {
     'ru-RU': 'ru',
     'de-DE': 'de',
     'es-ES': 'es',
+};
+
+/** Self-name of each app locale; the language switcher shows it untranslated. */
+export const LOCALE_NATIVE_NAMES: Record<AppLocale, string> = {
+    'zh-CN': '简体中文',
+    'zh-HK': '繁體中文',
+    'en-US': 'English',
+    'ja-JP': '日本語',
+    'ru-RU': 'Русский',
+    'de-DE': 'Deutsch',
+    'es-ES': 'Español',
 };
 
 export function isAppLocale(value: unknown): value is AppLocale {

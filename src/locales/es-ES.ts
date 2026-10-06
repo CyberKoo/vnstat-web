@@ -81,17 +81,6 @@ export default {
         fetchFailed: 'Error al cargar la vista general de interfaces',
     },
 
-    /** Nombres de idioma escritos en su propio idioma (selector de idioma) */
-    localeNames: {
-        'zh-CN': 'chino simplificado',
-        'zh-HK': 'chino tradicional',
-        'en-US': 'inglés',
-        'ja-JP': 'japonés',
-        'ru-RU': 'ruso',
-        'de-DE': 'alemán',
-        'es-ES': 'español',
-    },
-
     /** Barra superior */
     header: {
         switchLanguage: 'Idioma',

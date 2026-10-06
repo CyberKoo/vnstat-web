@@ -140,9 +140,9 @@ describe('locale config', () => {
 });
 
 describe('message catalogs', () => {
-    it.each(SUPPORTED_LOCALES)('catalog %s contains all 314 keys and replaces samplesSuffix', (locale) => {
+    it.each(SUPPORTED_LOCALES)('catalog %s contains all 307 keys and replaces samplesSuffix', (locale) => {
         const keys = leafKeys(catalogs[locale]).sort();
-        expect(keys).toHaveLength(314);
+        expect(keys).toHaveLength(307);
         expect(keys).toEqual(leafKeys(catalogs[DEFAULT_LOCALE]).sort());
         expect(keys).toContain('live.header.samples');
         expect(keys).not.toContain('live.header.samplesSuffix');

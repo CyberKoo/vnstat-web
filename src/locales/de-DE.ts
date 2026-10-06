@@ -81,17 +81,6 @@ export default {
         fetchFailed: 'Schnittstellenübersicht konnte nicht geladen werden',
     },
 
-    /** Language names written in their own language (language switcher) */
-    localeNames: {
-        'zh-CN': 'Vereinfachtes Chinesisch',
-        'zh-HK': 'Traditionelles Chinesisch',
-        'en-US': 'Englisch',
-        'ja-JP': 'Japanisch',
-        'ru-RU': 'Russisch',
-        'de-DE': 'Deutsch',
-        'es-ES': 'Spanisch',
-    },
-
     /** Top bar */
     header: {
         switchLanguage: 'Sprache',
