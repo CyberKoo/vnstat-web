@@ -36,6 +36,9 @@ const DAY_COMPARE_WINDOW = 7;
 /** Threshold for the hourly peak band: the ratio of a given hour's average to the average of the peak hour */
 const PEAK_BAND_RATIO = 0.7;
 
+/** Hours per day (size of the most-recent-24h window) */
+const HOURS_PER_DAY = 24;
+
 /** Minimum number of hourly samples required to judge the most recent 24h */
 const RECENT_MIN_SAMPLES = 12;
 
@@ -153,11 +156,13 @@ function buildHourInsights(items: TrafficItem[], allItems: TrafficItem[], format
         }
     }
 
-    const sampleCount = profile.filter((c) => c.recentTotal !== null).length;
-    const recentTotal = profile.reduce((s, c) => s + (c.recentTotal ?? 0), 0);
-    if (sampleCount >= RECENT_MIN_SAMPLES && histAvg > 0 && recentTotal > 0) {
+    // The most recent 24h window comes straight from the records: the profile's per-hour values
+    // are anchored to today (00:00 local), which is a different window
+    const recent = items.slice(-HOURS_PER_DAY);
+    const recentTotal = computeTotalBytes(recent);
+    if (recent.length >= RECENT_MIN_SAMPLES && histAvg > 0 && recentTotal > 0) {
         const ratio = recentTotal / histAvg;
-        const avgSpeed = formatSpeed?.(recentTotal / (sampleCount * 3600), 2);
+        const avgSpeed = formatSpeed?.(recentTotal / (recent.length * 3600), 2);
         if (avgSpeed) {
             out.push(
                 i18n.global.t('period.insights.hour.recentWithSpeed', {

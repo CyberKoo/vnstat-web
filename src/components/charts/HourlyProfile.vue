@@ -6,7 +6,7 @@
                 v-for="(cell, i) in profile"
                 :key="cell.hour"
                 class="hp-cell"
-                :class="colorClass(cell.avgTotal)"
+                :class="colorClass(cell.todayTotal ?? 0)"
                 role="button"
                 :tabindex="roving.tabIndex(i)"
                 :aria-label="cellTooltip(cell)"
@@ -44,7 +44,7 @@
             <span class="hp-legend-cell" :class="levelClass(3)" aria-hidden="true" />
             <span class="hp-legend-cell" :class="levelClass(4)" aria-hidden="true" />
             <span class="hp-legend-label">{{ t('chart.legend.high') }}</span>
-            <span v-if="hasRecent" class="hp-legend-hint">{{ t('chart.hourlyProfile.hoverHint') }}</span>
+            <span v-if="hasToday" class="hp-legend-hint">{{ t('chart.hourlyProfile.hoverHint') }}</span>
         </div>
     </div>
 </template>
@@ -61,26 +61,27 @@ import { formatBytes } from '@/utils/bytes';
 /**
  * 24h hour-of-day profile — a single row of 24 horizontal heatmap cells.
  *
- * Each cell is colored across 5 levels by the historical average total traffic for that hour (cyan → blue → purple color-mix),
- * and the cell bubble shows the historical average along with the actual value from the last 24h.
+ * Each cell is colored across 5 levels by today's actual total traffic for that hour (cyan → blue → purple color-mix);
+ * hours that have not happened today stay empty. The cell bubble shows the historical average as reference
+ * along with today's actual value.
  */
 const { t } = useI18n();
 const { profile } = useHourlyProfile();
 
 type ProfileCell = (typeof profile.value)[number];
 
-/** Maximum historical average traffic (used for grading) */
-const maxAvg = computed(() => profile.value.reduce((max, c) => Math.max(max, c.avgTotal), 0));
+/** Maximum total traffic today (used for grading) */
+const maxToday = computed(() => profile.value.reduce((max, c) => Math.max(max, c.todayTotal ?? 0), 0));
 
-/** Whether actual values from the last 24h exist */
-const hasRecent = computed(() => profile.value.some((c) => c.recentTotal !== null));
+/** Whether today's actual values exist */
+const hasToday = computed(() => profile.value.some((c) => c.todayTotal !== null));
 
 /** Bottom scale (one number every 4 hours) */
 const axisHours = computed(() => Array.from({ length: 6 }, (_v, i) => i * 4));
 
-/** 5 levels by average (0 = no data) */
+/** 5 levels by today's total (0 = no data) */
 function colorClass(value: number): string {
-    return levelClass(levelOf(value, maxAvg.value));
+    return levelClass(levelOf(value, maxToday.value));
 }
 
 /** Class name for each level */
@@ -104,8 +105,8 @@ function levelOf(value: number, max: number): number {
 function cellTooltip(cell: ProfileCell): string {
     const time = `${String(cell.hour).padStart(2, '0')}:00`;
     const avg = formatBytes(cell.avgRx + cell.avgTx, 1).formatted;
-    if (cell.recentTotal === null) return t('chart.hourlyProfile.cellTip', { time, avg });
-    return t('chart.hourlyProfile.cellTipToday', { time, avg, today: formatBytes(cell.recentTotal, 1).formatted });
+    if (cell.todayTotal === null) return t('chart.hourlyProfile.cellTip', { time, avg });
+    return t('chart.hourlyProfile.cellTipToday', { time, avg, today: formatBytes(cell.todayTotal, 1).formatted });
 }
 
 /**

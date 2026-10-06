@@ -23,13 +23,16 @@ function makeHourNoTime(timestamp: number, rx: number, tx: number): TrafficItem 
 }
 
 describe('buildHourlyProfile', () => {
+    // 2024-01-03 12:00 local: "today" is Jan 3
+    const NOW = new Date(2024, 0, 3, 12, 0, 0);
+
     it('returns 24 zero-valued cells for empty data', () => {
-        const profile = buildHourlyProfile([]);
+        const profile = buildHourlyProfile([], NOW);
         expect(profile).toHaveLength(24);
         for (const cell of profile) {
             expect(cell.avgTotal).toBe(0);
             expect(cell.samples).toBe(0);
-            expect(cell.recentTotal).toBeNull();
+            expect(cell.todayTotal).toBeNull();
         }
     });
 
@@ -41,7 +44,7 @@ describe('buildHourlyProfile', () => {
             makeHour(9, 3000, 1500, 1),
             makeHour(10, 4000, 2000, 1),
         ];
-        const profile = buildHourlyProfile(items);
+        const profile = buildHourlyProfile(items, NOW);
         expect(profile[9].samples).toBe(2);
         expect(profile[9].avgRx).toBe(2000);
         expect(profile[9].avgTx).toBe(1000);
@@ -52,33 +55,36 @@ describe('buildHourlyProfile', () => {
         expect(profile[0].samples).toBe(0);
     });
 
-    it('takes the last 24 entries for the recent 24h values, with the later one overwriting the earlier', () => {
-        // 25 entries: hour 0 appears twice (the first entry and the last one), the later hour overwrites
-        const items: TrafficItem[] = [];
-        for (let i = 0; i < 24; i++) items.push(makeHour(i, 100, 0, 0));
-        items.push(makeHour(0, 999, 1, 1));
-        const profile = buildHourlyProfile(items);
-        // the last 24 entries = hours 2 to 24 + 00:00 of the next day
-        expect(profile[0].recentRx).toBe(999);
-        expect(profile[0].recentTx).toBe(1);
-        expect(profile[0].recentTotal).toBe(1000);
-        expect(profile[1].recentRx).toBe(100);
-        expect(profile[23].recentRx).toBe(100);
-        // the average still uses all 25 samples
-        expect(profile[0].samples).toBe(2);
+    it('anchors actual values to today: hours not yet reached today stay null instead of showing yesterday', () => {
+        const items = [
+            makeHour(8, 100, 0, 1), // yesterday 08:00 -> not today
+            makeHour(8, 200, 0, 2), // today 08:00
+            makeHour(9, 999, 1, 2), // today 09:00, superseded by the next record
+            makeHour(9, 50, 0, 2), // today 09:00 (the later one wins)
+            makeHour(15, 300, 0, 1), // yesterday 15:00 -> hour 15 has not happened today
+        ];
+        const profile = buildHourlyProfile(items, NOW);
+        expect(profile[8].todayRx).toBe(200);
+        expect(profile[8].todayTotal).toBe(200);
+        expect(profile[9].todayTotal).toBe(50);
+        expect(profile[15].todayTotal).toBeNull();
+        // the average still uses every record
+        expect(profile[8].samples).toBe(2);
+        expect(profile[8].avgTotal).toBe(150);
+        expect(profile[15].avgTotal).toBe(300);
     });
 
     it('falls back to deriving the hour from timestamp when time.hour is missing', () => {
-        const ts = Math.floor(new Date(2024, 0, 1, 13, 0, 0).getTime() / 1000);
-        const profile = buildHourlyProfile([makeHourNoTime(ts, 500, 500)]);
-        expect(profile[13].samples).toBe(1);
-        expect(profile[13].avgTotal).toBe(1000);
-        expect(profile[13].recentTotal).toBe(1000);
+        const ts = Math.floor(new Date(2024, 0, 3, 8, 0, 0).getTime() / 1000);
+        const profile = buildHourlyProfile([makeHourNoTime(ts, 500, 500)], NOW);
+        expect(profile[8].samples).toBe(1);
+        expect(profile[8].avgTotal).toBe(1000);
+        expect(profile[8].todayTotal).toBe(1000);
     });
 
     it('treats missing rx/tx as 0', () => {
         const item = { ...makeHour(5, 0, 0), rx: undefined as unknown as number };
-        const profile = buildHourlyProfile([item]);
+        const profile = buildHourlyProfile([item], NOW);
         expect(profile[5].avgRx).toBe(0);
         expect(profile[5].samples).toBe(1);
     });

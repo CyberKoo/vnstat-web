@@ -18,12 +18,12 @@ export interface HourlyProfileCell {
     avgTotal: number;
     /** Number of sample days included in the average */
     samples: number;
-    /** Actual received bytes for that hour within the most recent 24h (null when there is no sample) */
-    recentRx: number | null;
-    /** Actual sent bytes for that hour within the most recent 24h (null when there is no sample) */
-    recentTx: number | null;
-    /** Actual total bytes for that hour within the most recent 24h (null when there is no sample) */
-    recentTotal: number | null;
+    /** Actual received bytes for that hour today (null when the hour has not happened today) */
+    todayRx: number | null;
+    /** Actual sent bytes for that hour today (null when the hour has not happened today) */
+    todayTx: number | null;
+    /** Actual total bytes for that hour today (null when the hour has not happened today) */
+    todayTotal: number | null;
 }
 
 /** Hours per day */
@@ -60,10 +60,11 @@ function itemWeekday(item: TrafficItem): number {
  *
  * For each hour it computes:
  * - the historical average (rx / tx / total) and the number of sample days
- * - the actual value of that hour among the most recent 24 hourly records (a cross-day window, where
- *   later records override earlier ones)
+ * - the actual value of that hour today (00:00 local up to `now`): hours that have not happened
+ *   today stay null instead of showing yesterday's value
  *
  * @param items List of hourly traffic data items (ascending by time)
+ * @param now Reference time for "today" (injectable for tests)
  * @returns Profile data for the 24 hours (always 24 entries, ascending by hour)
  *
  * @example
@@ -72,7 +73,7 @@ function itemWeekday(item: TrafficItem): number {
  * console.log(profile[9].avgTotal); // historical average traffic at 9 AM
  * ```
  */
-export function buildHourlyProfile(items: TrafficItem[]): HourlyProfileCell[] {
+export function buildHourlyProfile(items: TrafficItem[], now: Date = new Date()): HourlyProfileCell[] {
     const sumRx = new Array<number>(HOURS_PER_DAY).fill(0);
     const sumTx = new Array<number>(HOURS_PER_DAY).fill(0);
     const counts = new Array<number>(HOURS_PER_DAY).fill(0);
@@ -85,14 +86,17 @@ export function buildHourlyProfile(items: TrafficItem[]): HourlyProfileCell[] {
         counts[h] += 1;
     }
 
-    // Actual value per hour among the most recent 24 records (the latest one is kept for a repeated hour)
-    const recentRx = new Array<number | null>(HOURS_PER_DAY).fill(null);
-    const recentTx = new Array<number | null>(HOURS_PER_DAY).fill(null);
-    for (const item of items.slice(-HOURS_PER_DAY)) {
+    // Actual value per hour today (00:00 local up to now; a later record overrides an earlier one)
+    const todayRx = new Array<number | null>(HOURS_PER_DAY).fill(null);
+    const todayTx = new Array<number | null>(HOURS_PER_DAY).fill(null);
+    const dayStartSec = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / MS_IN_SECOND;
+    const nowSec = now.getTime() / MS_IN_SECOND;
+    for (const item of items) {
+        if (item.timestamp < dayStartSec || item.timestamp > nowSec) continue;
         const h = itemHour(item);
         if (h < 0 || h >= HOURS_PER_DAY) continue;
-        recentRx[h] = item.rx ?? 0;
-        recentTx[h] = item.tx ?? 0;
+        todayRx[h] = item.rx ?? 0;
+        todayTx[h] = item.tx ?? 0;
     }
 
     return Array.from({ length: HOURS_PER_DAY }, (_, hour) => {
@@ -105,9 +109,9 @@ export function buildHourlyProfile(items: TrafficItem[]): HourlyProfileCell[] {
             avgTx,
             avgTotal: avgRx + avgTx,
             samples,
-            recentRx: recentRx[hour],
-            recentTx: recentTx[hour],
-            recentTotal: recentRx[hour] !== null ? (recentRx[hour] ?? 0) + (recentTx[hour] ?? 0) : null,
+            todayRx: todayRx[hour],
+            todayTx: todayTx[hour],
+            todayTotal: todayRx[hour] !== null ? (todayRx[hour] ?? 0) + (todayTx[hour] ?? 0) : null,
         };
     });
 }
@@ -171,7 +175,7 @@ export type InterfaceDetailSource = Pick<ReturnType<typeof useInterfaceDetailSto
  * Composable for the hourly traffic profile.
  *
  * Aggregated from traffic.hour of the interface detail:
- * - `profile`: historical average traffic per hour 0-23 + the actual values of the most recent 24h
+ * - `profile`: historical average traffic per hour 0-23 + today's actual values (future hours: null)
  * - `weekMatrix`: 7×24 weekday × hour matrix of the current week's traffic (rows: Monday~Sunday)
  *
  * @param detail Source of the interface detail; defaults to the global store
