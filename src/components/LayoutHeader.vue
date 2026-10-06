@@ -184,6 +184,18 @@ defineEmits<{
     }
 }
 
+/* Firefox can report backdrop-filter support even when blur is not painted (e.g. Responsive
+   Design Mode or GPU blocklisting; bug 1868737). Use a 94% opaque theme surface on all Firefox
+   viewports <= 1023px, including tablets and narrow desktop windows, whether blur works or not.
+   This leaves 6% transparency, versus 54% in the light theme and 58% in the dark theme. */
+@supports (-moz-appearance: none) {
+    @media (--mobile) {
+        .s2-header-bar {
+            background: color-mix(in srgb, var(--s2-bg, #eef1f7) 94%, transparent);
+        }
+    }
+}
+
 .s2-header-actions {
     margin-left: auto;
     display: flex;

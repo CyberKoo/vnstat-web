@@ -9,8 +9,11 @@ import { nextTick } from 'vue';
  * - to light (retract): the new light snapshot sits underneath fully visible while the old dark
  *   snapshot on top shrinks back into the click point — the reverse playback of the expand.
  *
- * Falls back to an instant switch when the API is missing (older browsers, jsdom) or the user
- * prefers reduced motion.
+ * Falls back to an instant switch when the API is missing (older browsers, jsdom), the user
+ * prefers reduced motion, or the UA matches the WebKit/iOS heuristic below. This deliberately
+ * broad fallback avoids observed Safari rendering issues: fixed layers like the glass header
+ * dropping out of the root snapshot (bugs.webkit.org 279172) and clip-path animation flickering
+ * to black. It does not detect whether the current browser is actually affected.
  *
  * While the transition runs, `<html>` carries the `s2-theme-iris` class (see theme-s2.css): the
  * new snapshot is captured the instant the `dark` class flips, so theme-driven property
@@ -19,7 +22,7 @@ import { nextTick } from 'vue';
  */
 export function revealThemeTransition(event: MouseEvent, apply: () => void) {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion || typeof document.startViewTransition !== 'function') {
+    if (reduceMotion || isWebKit() || typeof document.startViewTransition !== 'function') {
         apply();
         return;
     }
@@ -36,7 +39,7 @@ export function revealThemeTransition(event: MouseEvent, apply: () => void) {
     const toDark = !root.classList.contains('dark');
     // Pre-clip coordinates for the CSS fallback: ::view-transition-new(root) starts fully clipped
     // away, so a browser that paints the new snapshot before the WAAPI animation's first frame
-    // (WebKit) shows the old theme instead of flashing the new one full-screen.
+    // shows the old theme instead of flashing the new one full-screen.
     root.style.setProperty('--iris-x', `${x}px`);
     root.style.setProperty('--iris-y', `${y}px`);
 
@@ -87,4 +90,17 @@ export function revealThemeTransition(event: MouseEvent, apply: () => void) {
             root.style.removeProperty('--iris-x');
             root.style.removeProperty('--iris-y');
         });
+}
+
+/**
+ * UA-based WebKit/iOS heuristic, not an engine capability test. All matching iOS device UAs
+ * are excluded regardless of engine. Macintosh UAs with multiple touch points are also
+ * excluded to cover iPadOS desktop mode. Otherwise, an AppleWebKit token without the listed
+ * exclusion tokens is treated as WebKit; unusual or spoofed UAs may be misclassified.
+ */
+function isWebKit(): boolean {
+    const ua = navigator.userAgent;
+    if (/iP(hone|ad|od)/.test(ua)) return true;
+    if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return true;
+    return /AppleWebKit/.test(ua) && !/(Chrome|Chromium|Edg|OPR|Android|jsdom)/.test(ua);
 }

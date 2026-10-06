@@ -1412,8 +1412,8 @@ body::before {
 ::view-transition-new(root) {
     z-index: 2147483646;
     /* Start fully clipped away: a browser that paints the new snapshot before the WAAPI
-       clip-path animation's first frame (WebKit) would otherwise flash the new theme
-       full-screen. The animation (fill: both) overrides this from its first frame on. */
+       clip-path animation's first frame would otherwise flash the new theme full-screen.
+       The animation (fill: both) overrides this from its first frame on. */
     clip-path: circle(0px at var(--iris-x, 50vw) var(--iris-y, 50vh));
 }
 
