@@ -72,13 +72,6 @@ export interface PeriodConfig {
      * month / this year vs last year; key: `periods.<type>.trend`)
      */
     trendLabelKey: 'periods.hour.trend' | 'periods.day.trend' | 'periods.month.trend' | 'periods.year.trend';
-
-    // ---- side panel ----
-    /** Average field label key (total duration / daily / monthly / yearly average) */
-    sideAvgLabelKey: 'periods.hour.sideAvg' | 'periods.day.sideAvg' | 'periods.month.sideAvg' | 'periods.year.sideAvg';
-    /** Peak field label key (peak / peak day / peak month / peak year) */
-    sidePeakLabelKey:
-        'periods.hour.sidePeak' | 'periods.day.sidePeak' | 'periods.month.sidePeak' | 'periods.year.sidePeak';
 }
 
 /**
@@ -103,8 +96,6 @@ export const PERIOD_CONFIGS: Record<PeriodType, PeriodConfig> = {
         peakValueInSubSpan: true,
         hasAvgCard: false,
         trendLabelKey: 'periods.hour.trend',
-        sideAvgLabelKey: 'periods.hour.sideAvg',
-        sidePeakLabelKey: 'periods.hour.sidePeak',
     },
     day: {
         dataField: 'day',
@@ -124,8 +115,6 @@ export const PERIOD_CONFIGS: Record<PeriodType, PeriodConfig> = {
         peakValueInSubSpan: false,
         hasAvgCard: true,
         trendLabelKey: 'periods.day.trend',
-        sideAvgLabelKey: 'periods.day.sideAvg',
-        sidePeakLabelKey: 'periods.day.sidePeak',
     },
     month: {
         dataField: 'month',
@@ -145,8 +134,6 @@ export const PERIOD_CONFIGS: Record<PeriodType, PeriodConfig> = {
         peakValueInSubSpan: false,
         hasAvgCard: true,
         trendLabelKey: 'periods.month.trend',
-        sideAvgLabelKey: 'periods.month.sideAvg',
-        sidePeakLabelKey: 'periods.month.sidePeak',
     },
     year: {
         dataField: 'year',
@@ -166,7 +153,5 @@ export const PERIOD_CONFIGS: Record<PeriodType, PeriodConfig> = {
         peakValueInSubSpan: false,
         hasAvgCard: true,
         trendLabelKey: 'periods.year.trend',
-        sideAvgLabelKey: 'periods.year.sideAvg',
-        sidePeakLabelKey: 'periods.year.sidePeak',
     },
 };

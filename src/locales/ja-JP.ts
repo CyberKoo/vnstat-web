@@ -133,8 +133,6 @@ export default {
             chartTitle: 'トラフィック推移',
             peak: 'ピーク時間帯',
             trend: '今時間 vs 前の時間',
-            sideAvg: '合計時間',
-            sidePeak: 'ピーク',
             /** 表示用の日付/時刻フォーマット（dayjs トークン）。レンダリングされる時刻印は UI 言語に追従 */
             format: {
                 tooltip: 'YYYY年M月D日 H時',
@@ -148,8 +146,6 @@ export default {
             chartTitle: 'トラフィック推移',
             avg: '1日平均トラフィック',
             trend: '今日 vs 昨日',
-            sideAvg: '日平均',
-            sidePeak: 'ピーク日',
             /** 表示用の日付/時刻フォーマット（dayjs トークン）。レンダリングされる時刻印は UI 言語に追従 */
             format: {
                 tooltip: 'YYYY年M月D日',
@@ -164,8 +160,6 @@ export default {
             avg: '月平均トラフィック',
             peak: 'ピーク月',
             trend: '今月 vs 先月',
-            sideAvg: '月平均',
-            sidePeak: 'ピーク月',
             /** 表示用の日付/時刻フォーマット（dayjs トークン）。レンダリングされる時刻印は UI 言語に追従 */
             format: {
                 tooltip: 'YYYY年M月',
@@ -180,8 +174,6 @@ export default {
             avg: '年平均トラフィック',
             peak: 'ピーク年',
             trend: '今年 vs 昨年',
-            sideAvg: '年平均',
-            sidePeak: 'ピーク年',
             /** 表示用の日付/時刻フォーマット（dayjs トークン）。レンダリングされる時刻印は UI 言語に追従 */
             format: {
                 tooltip: 'YYYY',
@@ -220,7 +212,6 @@ export default {
         },
         panel: {
             composition: 'トラフィック構成',
-            details: '詳細',
         },
         table: {
             detailTitle: 'データ詳細',
@@ -277,11 +268,6 @@ export default {
                 month: '今月 vs 先月',
                 year: '今年 vs 昨年',
             },
-        },
-        side: {
-            total: '合計',
-            duration: '{count} 時間',
-            rxShare: 'RX 割合',
         },
         table: {
             columns: {
@@ -363,7 +349,7 @@ export default {
         compact: {
             title: '過去24時間',
             total: '合計',
-            bandwidthUsage: '帯域使用率',
+            vsRecentPeak: '直近 3 時間のピーク比',
         },
         chart: {
             title: 'リアルタイムレート',
@@ -517,11 +503,6 @@ export default {
         },
         donut: {
             title: 'トラフィック内訳',
-        },
-        side: {
-            details: '詳細',
-            count: '記録数',
-            rxShare: 'RX 割合',
         },
         table: {
             title: 'ランキング詳細',

@@ -134,8 +134,6 @@ export default {
             chartTitle: 'Traffic trend',
             peak: 'Peak hour',
             trend: 'Current vs last hour',
-            sideAvg: 'Total duration',
-            sidePeak: 'Peak',
             /** Display date/time formats (dayjs tokens), kept per-locale so rendered timestamps follow the UI language */
             format: {
                 tooltip: 'MMM D, YYYY h A',
@@ -149,8 +147,6 @@ export default {
             chartTitle: 'Traffic trend',
             avg: 'Daily average traffic',
             trend: 'Today vs yesterday',
-            sideAvg: 'Daily avg',
-            sidePeak: 'Peak day',
             /** Display date/time formats (dayjs tokens), kept per-locale so rendered timestamps follow the UI language */
             format: {
                 tooltip: 'MMM D, YYYY',
@@ -165,8 +161,6 @@ export default {
             avg: 'Monthly average traffic',
             peak: 'Peak month',
             trend: 'This month vs last month',
-            sideAvg: 'Monthly avg',
-            sidePeak: 'Peak month',
             /** Display date/time formats (dayjs tokens), kept per-locale so rendered timestamps follow the UI language */
             format: {
                 tooltip: 'MMM YYYY',
@@ -181,8 +175,6 @@ export default {
             avg: 'Yearly average traffic',
             peak: 'Peak year',
             trend: 'This year vs last year',
-            sideAvg: 'Yearly avg',
-            sidePeak: 'Peak year',
             /** Display date/time formats (dayjs tokens), kept per-locale so rendered timestamps follow the UI language */
             format: {
                 tooltip: 'YYYY',
@@ -221,7 +213,6 @@ export default {
         },
         panel: {
             composition: 'Traffic mix',
-            details: 'Details',
         },
         table: {
             detailTitle: 'Data details',
@@ -278,11 +269,6 @@ export default {
                 month: 'This month vs last month',
                 year: 'This year vs last year',
             },
-        },
-        side: {
-            total: 'Total',
-            duration: '{count} h',
-            rxShare: 'RX share',
         },
         table: {
             columns: {
@@ -365,7 +351,7 @@ export default {
         compact: {
             title: 'Last 24 hours',
             total: 'Total',
-            bandwidthUsage: 'Bandwidth usage',
+            vsRecentPeak: 'Vs. 3-hour peak',
         },
         chart: {
             title: 'Live rate',
@@ -519,11 +505,6 @@ export default {
         },
         donut: {
             title: 'Traffic breakdown',
-        },
-        side: {
-            details: 'Details',
-            count: 'Records',
-            rxShare: 'RX share',
         },
         table: {
             title: 'Ranking details',

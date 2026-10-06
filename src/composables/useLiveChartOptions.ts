@@ -4,10 +4,10 @@ import type { ChartOptions } from 'chart.js';
 import type { InterfaceLinkSpeed, TimedNetworkStats, VnstatInterfaceDetail } from '@/types/network';
 import { formatBytes } from '@/utils/bytes';
 import { formatNumber } from '@/utils/numbers';
-import { BITS_PER_BYTE, BITS_PER_MBIT } from '@/constants';
 import { LINK_SPEED } from '@/config';
 import { palette } from '@/config/colors';
 import { mbpsToBytesPerSec } from '@/composables/liveThreshold';
+import { FIVEMINUTE_INTERVAL_SEC } from '@/composables/replayWindow';
 import { useSpeedFormat } from '@/composables/useSpeedFormat';
 
 /**
@@ -153,19 +153,40 @@ export function useLiveChartOptions(
         formatSpeed(mbpsToBytesPerSec(Math.max(effectiveLinkSpeed.value.rx, effectiveLinkSpeed.value.tx)), 1),
     );
 
-    /** RX utilisation percentage */
-    const rxUtilPct = computed(() => {
-        const rxBits = (latestTraffic.value?.stats?.rx?.bytespersecond ?? 0) * BITS_PER_BYTE;
-        const maxBits = effectiveLinkSpeed.value.rx * BITS_PER_MBIT;
-        return Math.min(Math.round((rxBits / maxBits) * 100), 100);
+    /**
+     * Recent peak rates (bytes/s) per direction: the highest 5-minute average among the last 36
+     * five-minute entries (≈3h, the same window as the mini trend bar). The utilisation bars scale
+     * against this instead of the link capacity — a 28 Kbps stream on a 1 Gbps link used to pin
+     * both bars at a rounded 0%, leaving them without any information.
+     */
+    const recentPeak = computed(() => {
+        const items = detailRef.value?.traffic?.fiveminute?.slice(-36) ?? [];
+        let rx = 0;
+        let tx = 0;
+        for (const d of items) {
+            rx = Math.max(rx, (d.rx ?? 0) / FIVEMINUTE_INTERVAL_SEC);
+            tx = Math.max(tx, (d.tx ?? 0) / FIVEMINUTE_INTERVAL_SEC);
+        }
+        return { rx, tx };
     });
 
-    /** TX utilisation percentage */
-    const txUtilPct = computed(() => {
-        const txBits = (latestTraffic.value?.stats?.tx?.bytespersecond ?? 0) * BITS_PER_BYTE;
-        const maxBits = effectiveLinkSpeed.value.tx * BITS_PER_MBIT;
-        return Math.min(Math.round((txBits / maxBits) * 100), 100);
+    /** Current rate as a share of the recent peak (the current rate joins the max, so it never overflows) */
+    const rxPeakPct = computed(() => {
+        const cur = latestTraffic.value?.stats?.rx?.bytespersecond ?? 0;
+        const base = Math.max(recentPeak.value.rx, cur);
+        return base > 0 ? Math.min(Math.round((cur / base) * 100), 100) : 0;
     });
+
+    /** TX share of the recent peak */
+    const txPeakPct = computed(() => {
+        const cur = latestTraffic.value?.stats?.tx?.bytespersecond ?? 0;
+        const base = Math.max(recentPeak.value.tx, cur);
+        return base > 0 ? Math.min(Math.round((cur / base) * 100), 100) : 0;
+    });
+
+    /** Current RX/TX rates, formatted (shown beside the bars; the link capacity stays in the header) */
+    const rxRate = computed(() => formatSpeed(latestTraffic.value?.stats?.rx?.bytespersecond ?? 0));
+    const txRate = computed(() => formatSpeed(latestTraffic.value?.stats?.tx?.bytespersecond ?? 0));
 
     // ── Mini trend bar ──
 
@@ -219,8 +240,10 @@ export function useLiveChartOptions(
         s2CompactOptions,
         compactStats,
         maxBandwidth,
-        rxUtilPct,
-        txUtilPct,
+        rxPeakPct,
+        txPeakPct,
+        rxRate,
+        txRate,
         s2MiniBarData,
         s2MiniBarOptions,
     };

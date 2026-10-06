@@ -45,7 +45,7 @@ export function computeTrend(currentTotal: number, previousTotal: number): Trend
  *
  * Returns the semantic color matching trendType:
  * - error → palette.danger (rose too much)
- * - success → palette.tx (fell too much)
+ * - success → neutral muted (fell too much; traffic up/down is neither good nor bad, so no data color is borrowed)
  * - default → palette.accent (normal range)
  *
  * @param trendType Reactive reference to the trend type
@@ -54,7 +54,7 @@ export function computeTrend(currentTotal: number, previousTotal: number): Trend
 export function useTrendColor(trendType: Ref<TrendResult['trendType']>) {
     return computed(() => {
         if (trendType.value === 'error') return palette.danger;
-        if (trendType.value === 'success') return palette.tx;
+        if (trendType.value === 'success') return 'var(--s2-text-muted)';
         return palette.accent;
     });
 }

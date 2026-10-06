@@ -31,16 +31,6 @@
                     </div>
                 </div>
             </div>
-            <div class="s2-sidebar-divider"></div>
-            <div class="s2-sidebar-item">
-                <div class="s2-sidebar-label">{{ t('chart.panel.details') }}</div>
-                <div class="s2-sidebar-stats">
-                    <div v-for="row in detailRows" :key="row.label" class="s2-sidebar-row">
-                        <span class="s2-sidebar-row-label">{{ row.label }}</span>
-                        <span class="mono s2-mono-strong">{{ row.value }}</span>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </template>
@@ -54,16 +44,6 @@ import { donutOptions } from '@/composables/useTrafficChart';
 import { useChartMode } from '@/composables/useChartMode';
 import SegmentedToggle from '@/components/charts/SegmentedToggle.vue';
 
-/**
- * Detail row configuration.
- */
-export interface DetailRow {
-    /** Label text */
-    label: string;
-    /** Display value */
-    value: string;
-}
-
 const props = withDefaults(
     defineProps<{
         /** Bar chart data */
@@ -76,8 +56,6 @@ const props = withDefaults(
         donutData: ChartData<'doughnut'>;
         /** RX share (with the percent sign, e.g. "35.6%") */
         rxPercent: string;
-        /** Detail row configuration array */
-        detailRows: DetailRow[];
         /** Whether to offer the "cumulative" chart mode (not offered in the hourly view) */
         allowCumulative?: boolean;
         /** Main chart section title (translated by the caller) */

@@ -14,7 +14,7 @@
             </div>
             <div class="s2-compact-util">
                 <div class="s2-compact-util-head">
-                    <span class="s2-sidebar-label">{{ t('live.compact.bandwidthUsage') }}</span>
+                    <span class="s2-sidebar-label">{{ t('live.compact.vsRecentPeak') }}</span>
                     <Transition name="s2-fade" mode="out-in">
                         <!-- Link speed loading → skeleton, then fade in the real value on success to avoid the default value flashing -->
                         <span
@@ -30,18 +30,18 @@
                     <div class="s2-util-row">
                         <span class="s2-util-label">RX</span>
                         <div class="s2-util-track">
-                            <div class="s2-util-fill" :style="{ width: rxUtilPct + '%' }"></div>
-                            <span class="s2-util-num mono s2-util-num-inner">{{ rxUtilPct }}%</span>
+                            <div class="s2-util-fill" :style="{ width: rxPeakPct + '%' }"></div>
+                            <span class="s2-util-num mono s2-util-num-inner">{{ rxRate }}</span>
                         </div>
-                        <span class="s2-util-num mono s2-util-num-outer">{{ rxUtilPct }}%</span>
+                        <span class="s2-util-num mono s2-util-num-outer">{{ rxRate }}</span>
                     </div>
                     <div class="s2-util-row">
                         <span class="s2-util-label">TX</span>
                         <div class="s2-util-track">
-                            <div class="s2-util-fill tx" :style="{ width: txUtilPct + '%' }"></div>
-                            <span class="s2-util-num mono s2-util-num-inner">{{ txUtilPct }}%</span>
+                            <div class="s2-util-fill tx" :style="{ width: txPeakPct + '%' }"></div>
+                            <span class="s2-util-num mono s2-util-num-inner">{{ txRate }}</span>
                         </div>
-                        <span class="s2-util-num mono s2-util-num-outer">{{ txUtilPct }}%</span>
+                        <span class="s2-util-num mono s2-util-num-outer">{{ txRate }}</span>
                     </div>
                 </div>
             </div>
@@ -62,8 +62,12 @@ defineProps<{
     compactStats: { total: string; rxPct: number; txPct: number };
     maxBandwidth: string;
     linkSpeedLoading: boolean;
-    rxUtilPct: number;
-    txUtilPct: number;
+    /** Current rate as a share of the recent (≈3h) peak, 0-100 */
+    rxPeakPct: number;
+    txPeakPct: number;
+    /** Current RX/TX rates, formatted (e.g. "28.0 Kbps") */
+    rxRate: string;
+    txRate: string;
 }>();
 </script>
 
@@ -196,9 +200,10 @@ defineProps<{
 .s2-util-num-outer {
     font-size: 11px;
     font-weight: 600;
-    width: 32px;
+    min-width: 60px;
     text-align: right;
     flex-shrink: 0;
+    white-space: nowrap;
     color: var(--s2-text);
 }
 

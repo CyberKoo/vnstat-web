@@ -79,7 +79,6 @@ const countKeys = [
     'period.stats.total.day',
     'period.stats.total.month',
     'period.stats.total.year',
-    'period.side.duration',
 ];
 const daysKeys = [
     'overview.trend.title',
@@ -140,9 +139,9 @@ describe('locale config', () => {
 });
 
 describe('message catalogs', () => {
-    it.each(SUPPORTED_LOCALES)('catalog %s contains all 307 keys and replaces samplesSuffix', (locale) => {
+    it.each(SUPPORTED_LOCALES)('catalog %s contains all 292 keys and replaces samplesSuffix', (locale) => {
         const keys = leafKeys(catalogs[locale]).sort();
-        expect(keys).toHaveLength(307);
+        expect(keys).toHaveLength(292);
         expect(keys).toEqual(leafKeys(catalogs[DEFAULT_LOCALE]).sort());
         expect(keys).toContain('live.header.samples');
         expect(keys).not.toContain('live.header.samplesSuffix');

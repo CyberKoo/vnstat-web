@@ -29,25 +29,23 @@ export interface PeriodMetrics {
     statsHeader: ComputedRef<TrafficStatItem[]>;
     /** Donut chart data for the side panel */
     donutData: ComputedRef<ChartData<'doughnut'>>;
-    /** Side panel headline figures */
-    sideStats: ComputedRef<{ total: string; avg: string; peak: string; rxPercent: string }>;
-    /** Side panel detail rows */
-    detailRows: ComputedRef<{ label: string; value: string }[]>;
+    /** RX share shown at the donut center (with the percent sign, e.g. "35.6%") */
+    rxPercent: ComputedRef<string>;
 }
 
 /**
- * The numbers of a period page: the stat card band, the period-over-period comparison, the donut
- * and the side panel.
+ * The numbers of a period page: the stat card band, the period-over-period comparison and the donut.
  *
- * All four read the same `statsItems` window, so the total shown on a card and the total in the
- * side panel cannot drift apart. The trend and comparison series stay internal — they exist to
- * pick which cards to show, not to be rendered directly.
+ * All three read the same `statsItems` window, so the total shown on a card and the donut share
+ * cannot drift apart. The trend and comparison series stay internal — they exist to pick which
+ * cards to show, not to be rendered directly. The side panel deliberately carries no detail rows:
+ * they repeated the metric band, and the table owns the breakdown.
  *
  * @param data Shared data context from {@link usePeriodData}
- * @returns Stat cards, donut data, side stats and detail rows
+ * @returns Stat cards, donut data and the RX share
  */
 export function usePeriodMetrics(data: PeriodDataContext): PeriodMetrics {
-    const { period, config, allItems, statsItems, statsLimit } = data;
+    const { period, config, allItems, statsItems } = data;
     const { t } = useI18n();
 
     // ---- Trend ----
@@ -159,7 +157,8 @@ export function usePeriodMetrics(data: PeriodDataContext): PeriodMetrics {
             });
         }
 
-        // Trend card (a ↗/↘ arrow is prefixed to the value; the color follows trendType: success green / danger red)
+        // Trend card (a ↗/↘ arrow is prefixed to the value; the color follows trendType: danger red for a
+        // sharp rise, neutral muted for a sharp drop — traffic up/down is neither good nor bad)
         // For the month / year periods the trend card covers the same window as the period-over-period card
         // (this month vs last month / this year vs last year), so it is skipped when compare data exists
         const trendDuplicatesCompare = (period === 'month' || period === 'year') && compareResult.value;
@@ -192,45 +191,11 @@ export function usePeriodMetrics(data: PeriodDataContext): PeriodMetrics {
 
     const donutData = computed<ChartData<'doughnut'>>(() => buildDonutData(statsItems.value));
 
-    const sideStats = computed(() => {
-        const items = statsItems.value;
-        if (!items.length) return { total: '0 B', avg: '0 B', peak: '-', rxPercent: '0%' };
-        const { totalRx, total } = computeRxTxTotals(items);
-        const peak = items.reduce(
-            (max, d) => {
-                const total = (d.rx ?? 0) + (d.tx ?? 0);
-                return total > max.val
-                    ? { val: total, label: formatTimestamp(d.timestamp, t(config.chartDateFormatKey)) }
-                    : max;
-            },
-            { val: 0, label: '-' },
-        );
-        return {
-            total: formatBytes(total).formatted,
-            avg: formatBytes(Math.round(total / items.length)).formatted,
-            peak: peak.label + ' ' + formatBytes(peak.val).formatted,
-            rxPercent: total > 0 ? formatDecimal((totalRx / total) * 100, 1) + '%' : '0%',
-        };
+    /** RX share for the donut center (the only side-panel figure — details live in the metric band and the table) */
+    const rxPercent = computed(() => {
+        const { totalRx, total } = computeRxTxTotals(statsItems.value);
+        return total > 0 ? formatDecimal((totalRx / total) * 100, 1) + '%' : '0%';
     });
 
-    /** Side panel detail row configuration */
-    const detailRows = computed(() => {
-        const rows: { label: string; value: string }[] = [
-            { label: t('period.side.total'), value: sideStats.value.total },
-        ];
-        // Hourly special case: show the total duration (fixed 24h)
-        if (config.dataField === 'hour') {
-            rows.push({
-                label: t(config.sideAvgLabelKey),
-                value: t('period.side.duration', { count: formatNumber(statsLimit.value) }, statsLimit.value),
-            });
-        } else {
-            rows.push({ label: t(config.sideAvgLabelKey), value: sideStats.value.avg });
-        }
-        rows.push({ label: t(config.sidePeakLabelKey), value: sideStats.value.peak });
-        rows.push({ label: t('period.side.rxShare'), value: sideStats.value.rxPercent });
-        return rows;
-    });
-
-    return { statsHeader, donutData, sideStats, detailRows };
+    return { statsHeader, donutData, rxPercent };
 }

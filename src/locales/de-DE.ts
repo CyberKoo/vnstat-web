@@ -135,8 +135,6 @@ export default {
             chartTitle: 'Traffic-Trend',
             peak: 'Spitzenstunde',
             trend: 'Aktuelle vs. letzte Stunde',
-            sideAvg: 'Gesamtdauer',
-            sidePeak: 'Spitze',
             /** Display date/time formats (dayjs tokens), kept per-locale so rendered timestamps follow the UI language */
             format: {
                 tooltip: 'D. MMM YYYY, H [Uhr]',
@@ -150,8 +148,6 @@ export default {
             chartTitle: 'Traffic-Trend',
             avg: 'Tagesdurchschnitt',
             trend: 'Heute vs. gestern',
-            sideAvg: 'Tages-Ø',
-            sidePeak: 'Spitzentag',
             /** Display date/time formats (dayjs tokens), kept per-locale so rendered timestamps follow the UI language */
             format: {
                 tooltip: 'D. MMM YYYY',
@@ -166,8 +162,6 @@ export default {
             avg: 'Monatsdurchschnitt',
             peak: 'Spitzenmonat',
             trend: 'Dieser Monat vs. letzter Monat',
-            sideAvg: 'Monats-Ø',
-            sidePeak: 'Spitzenmonat',
             /** Display date/time formats (dayjs tokens), kept per-locale so rendered timestamps follow the UI language */
             format: {
                 tooltip: 'MMM YYYY',
@@ -182,8 +176,6 @@ export default {
             avg: 'Jahresdurchschnitt',
             peak: 'Spitzenjahr',
             trend: 'Dieses Jahr vs. letztes Jahr',
-            sideAvg: 'Jahres-Ø',
-            sidePeak: 'Spitzenjahr',
             /** Display date/time formats (dayjs tokens), kept per-locale so rendered timestamps follow the UI language */
             format: {
                 tooltip: 'YYYY',
@@ -222,7 +214,6 @@ export default {
         },
         panel: {
             composition: 'Traffic-Mix',
-            details: 'Details',
         },
         table: {
             detailTitle: 'Datendetails',
@@ -279,11 +270,6 @@ export default {
                 month: 'Dieser Monat vs. letzter Monat',
                 year: 'Dieses Jahr vs. letztes Jahr',
             },
-        },
-        side: {
-            total: 'Gesamt',
-            duration: '{count} Std.',
-            rxShare: 'RX-Anteil',
         },
         table: {
             columns: {
@@ -368,7 +354,7 @@ export default {
         compact: {
             title: 'Letzte 24 Stunden',
             total: 'Gesamt',
-            bandwidthUsage: 'Bandbreitennutzung',
+            vsRecentPeak: 'Vgl. 3-Std.-Spitze',
         },
         chart: {
             title: 'Live-Rate',
@@ -522,11 +508,6 @@ export default {
         },
         donut: {
             title: 'Traffic-Aufschlüsselung',
-        },
-        side: {
-            details: 'Details',
-            count: 'Einträge',
-            rxShare: 'RX-Anteil',
         },
         table: {
             title: 'Ranglistendetails',

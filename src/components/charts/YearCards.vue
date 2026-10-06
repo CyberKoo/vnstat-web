@@ -182,15 +182,25 @@ function barHeight(v: number | null, monthly: (number | null)[]): string {
 .s2-year-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
 }
 
+/* Columns inside the sheet, not nested cards: transparent background, hairline dividers
+   between neighbours — the sheet's "one panel + hairlines" rule applies here too */
 .s2-year-card {
-    padding: 16px 18px 14px;
-    border: 1px solid var(--s2-border-light);
+    padding: 4px 24px 8px;
     transition: border-color var(--s2-transition);
-    border-radius: var(--s2-radius-sm);
-    background: var(--s2-card);
+}
+
+.s2-year-card:first-child {
+    padding-left: 0;
+}
+
+.s2-year-card:last-child {
+    padding-right: 0;
+}
+
+.s2-year-card + .s2-year-card {
+    border-left: 1px solid var(--s2-border-light);
 }
 
 .s2-year-card-head {
@@ -297,13 +307,31 @@ function barHeight(v: number | null, monthly: (number | null)[]): string {
     outline-offset: 1px;
 }
 
+/* In-progress month: full-strength RX blue (siblings are 55%) — amber stays reserved for peaks */
 .s2-year-card-mbar.is-current {
-    background: var(--accent);
+    background: var(--rx);
 }
 
 @media (--mobile) {
     .s2-year-cards {
         grid-template-columns: 1fr;
+    }
+
+    .s2-year-card {
+        padding: 16px 0;
+    }
+
+    .s2-year-card:first-child {
+        padding-top: 4px;
+    }
+
+    .s2-year-card:last-child {
+        padding-bottom: 0;
+    }
+
+    .s2-year-card + .s2-year-card {
+        border-left: none;
+        border-top: 1px solid var(--s2-border-light);
     }
 }
 </style>

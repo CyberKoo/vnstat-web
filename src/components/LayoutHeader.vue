@@ -236,8 +236,10 @@ defineEmits<{
 }
 
 @media (--mobile) {
+    /* Kept visible on narrow screens (it is the only way to switch rate units there);
+       tightened padding so the 390px bar still fits */
     .s2-unit-toggle {
-        display: none;
+        padding: 0 6px;
     }
 }
 

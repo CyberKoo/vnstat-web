@@ -143,8 +143,6 @@ export default {
             chartTitle: '流量趋势',
             peak: '峰值小时',
             trend: '当前 vs 上一小时',
-            sideAvg: '总时长',
-            sidePeak: '峰值',
             /** 展示用日期/时间格式（dayjs token），随语言切换 */
             format: {
                 tooltip: 'YYYY-MM-DD HH:00',
@@ -158,8 +156,6 @@ export default {
             chartTitle: '流量趋势',
             avg: '日均流量',
             trend: '今日 vs 昨日',
-            sideAvg: '日均',
-            sidePeak: '峰值日',
             /** 展示用日期/时间格式（dayjs token），随语言切换 */
             format: {
                 tooltip: 'YYYY-MM-DD',
@@ -174,8 +170,6 @@ export default {
             avg: '月均流量',
             peak: '峰值月',
             trend: '本月 vs 上月',
-            sideAvg: '月均',
-            sidePeak: '峰值月',
             /** 展示用日期/时间格式（dayjs token），随语言切换 */
             format: {
                 tooltip: 'YYYY-MM',
@@ -190,8 +184,6 @@ export default {
             avg: '年均流量',
             peak: '峰值年',
             trend: '本年 vs 上年',
-            sideAvg: '年均',
-            sidePeak: '峰值年',
             /** 展示用日期/时间格式（dayjs token），随语言切换 */
             format: {
                 tooltip: 'YYYY',
@@ -230,7 +222,6 @@ export default {
         },
         panel: {
             composition: '流量构成',
-            details: '详情',
         },
         table: {
             detailTitle: '数据明细',
@@ -287,11 +278,6 @@ export default {
                 month: '本月 vs 上月',
                 year: '本年 vs 上年',
             },
-        },
-        side: {
-            total: '周期总量',
-            duration: '{count} 小时',
-            rxShare: '接收占比',
         },
         table: {
             columns: {
@@ -373,7 +359,7 @@ export default {
         compact: {
             title: '24 小时概览',
             total: '合计',
-            bandwidthUsage: '带宽利用率',
+            vsRecentPeak: '对比近 3 小时峰值',
         },
         chart: {
             title: '实时速率',
@@ -526,11 +512,6 @@ export default {
         },
         donut: {
             title: '流量构成',
-        },
-        side: {
-            details: '详情',
-            count: '记录数',
-            rxShare: '接收占比',
         },
         table: {
             title: '排行明细',

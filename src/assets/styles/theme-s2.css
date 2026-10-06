@@ -487,7 +487,15 @@ body::before {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
     font-size: 12px;
+    /* Body cells are numeric: right alignment lines up the mono decimals */
+    text-align: right;
     transition: border-color var(--s2-transition);
+}
+
+/* Column headers follow their cells — except the first column (rank / period / interface name),
+   whose body cells are left-aligned row headers */
+.s2-table thead th + th {
+    text-align: right;
 }
 
 /* Row header cells: the generic .s2-table th rule above styles every th as a column header,

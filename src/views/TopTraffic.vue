@@ -41,32 +41,8 @@
                         <div class="s2-ring-wrap s2-ring-wrap--sm">
                             <Doughnut :data="donutData" :options="donutOptions" />
                             <div class="s2-ring-center">
-                                <div class="s2-ring-center-val">{{ sideStats.rxPercent }}</div>
+                                <div class="s2-ring-center-val">{{ rxPercent }}</div>
                                 <div class="s2-ring-center-label">{{ t('common.rx') }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="s2-sidebar-divider"></div>
-                    <div class="s2-sidebar-item">
-                        <div class="s2-sidebar-label">{{ t('top.side.details') }}</div>
-                        <div class="s2-sidebar-stats">
-                            <div class="s2-sidebar-row">
-                                <span class="s2-sidebar-row-label">{{ t('top.side.count') }}</span
-                                ><span class="mono s2-mono-strong"
-                                    >{{ sideStats.count }} {{ t('top.metrics.counterSuffix') }}</span
-                                >
-                            </div>
-                            <div class="s2-sidebar-row">
-                                <span class="s2-sidebar-row-label">{{ t('top.metrics.totalTraffic') }}</span
-                                ><span class="mono s2-mono-strong">{{ sideStats.total }}</span>
-                            </div>
-                            <div class="s2-sidebar-row">
-                                <span class="s2-sidebar-row-label">{{ t('top.metrics.peakShare') }}</span
-                                ><span class="mono s2-mono-strong">{{ sideStats.peakPercent }}</span>
-                            </div>
-                            <div class="s2-sidebar-row">
-                                <span class="s2-sidebar-row-label">{{ t('top.side.rxShare') }}</span
-                                ><span class="mono s2-mono-strong">{{ sideStats.rxPercent }}</span>
                             </div>
                         </div>
                     </div>
@@ -159,8 +135,8 @@ const chartHeight = computed(() => {
     return isMobile.value ? 280 : Math.max(420, n * 34 + 64);
 });
 
-/** Accent colors for the top three bars / rank badges: 1st accent, 2nd brand, 3rd tx */
-const RANK_COLORS = [palette.accent, palette.brand, palette.tx] as const;
+/** Brand-purple steps for the top three bars / rank badges (the rest of the bars fade to 35%) */
+const RANK_COLORS = [palette.brand, hexToRgba(palette.brand, 0.7), hexToRgba(palette.brand, 0.5)] as const;
 
 /** Bar fill color: the top three are accented, the rest use the brand color at 35% opacity */
 function barColor(ctx: ScriptableContext<'bar'>): string {
@@ -195,7 +171,7 @@ const peakPercentage = computed(() => peakSharePercent(topItems.value));
  * Horizontal ranking bar chart data.
  *
  * Sorted by total traffic in descending order (1st place at the top), taking only the top CHART_TOP_N;
- * the top three use the accent / rx / tx accent colors, the rest use rx at 35% opacity.
+ * the top three use the brand-purple steps of RANK_COLORS, the rest use brand at 35% opacity.
  */
 const chartData: ComputedRef<ChartData<'bar'>> = computed(() => {
     const items = chartItems.value;
@@ -279,17 +255,10 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => ({
 
 const donutData = computed<ChartData<'doughnut'>>(() => buildDonutData(topItems.value));
 
-const sideStats = computed(() => {
-    const items = topItems.value;
-    const count = items.length;
-    if (!count) return { count: 0, total: '0 B', peakPercent: '0%', rxPercent: '0%' };
-    const { totalRx, total } = computeRxTxTotals(items);
-    return {
-        count,
-        total: formatBytes(total).formatted,
-        peakPercent: peakSharePercent(items),
-        rxPercent: total > 0 ? formatDecimal((totalRx / total) * 100, 1) + '%' : '0%',
-    };
+/** RX share for the donut center (the only side-panel figure — the metric band already carries the rest) */
+const rxPercent = computed(() => {
+    const { totalRx, total } = computeRxTxTotals(topItems.value);
+    return total > 0 ? formatDecimal((totalRx / total) * 100, 1) + '%' : '0%';
 });
 
 /** Table row data (already formatted) */
@@ -361,6 +330,12 @@ const dataColumns = computed(() => tableColumns.value.slice(1));
     font-weight: 600;
     color: var(--s2-text-muted);
     width: 48px;
+}
+
+/* The date column renders as a left-aligned row header (th[scope=row]); the global
+   "thead th + th aligns right" rule would right-align its column header, so keep it left */
+.s2-table thead th:nth-child(2) {
+    text-align: left;
 }
 
 /* ══ Rank badge ══ */

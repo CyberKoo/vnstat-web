@@ -163,8 +163,7 @@
                 :chart-height="chartHeight"
                 :chart-title="chartTitle"
                 :donut-data="donutData"
-                :rx-percent="sideStats.rxPercent"
-                :detail-rows="detailRows"
+                :rx-percent="rxPercent"
                 :allow-cumulative="supportsCumulative"
             />
         </section>
@@ -224,8 +223,7 @@ const {
     chartData,
     chartOptions,
     donutData,
-    sideStats,
-    detailRows,
+    rxPercent,
     peakPeriods,
     tableDateLabels,
     tableColumns,

@@ -17,8 +17,10 @@
                 :compact-stats="compactStats"
                 :max-bandwidth="maxBandwidth"
                 :link-speed-loading="linkSpeedLoading"
-                :rx-util-pct="rxUtilPct"
-                :tx-util-pct="txUtilPct"
+                :rx-peak-pct="rxPeakPct"
+                :tx-peak-pct="txPeakPct"
+                :rx-rate="rxRate"
+                :tx-rate="txRate"
             />
         </section>
 
@@ -116,8 +118,10 @@ const {
     s2CompactOptions,
     compactStats,
     maxBandwidth,
-    rxUtilPct,
-    txUtilPct,
+    rxPeakPct,
+    txPeakPct,
+    rxRate,
+    txRate,
     s2MiniBarData,
     s2MiniBarOptions,
 } = useLiveChartOptions(latestTraffic, detailRef, linkSpeed);

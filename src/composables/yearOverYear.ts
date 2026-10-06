@@ -58,11 +58,11 @@ function localizedDayjs() {
     return dayjs().locale(LOCALE_DAYJS[i18n.global.locale.value]);
 }
 
-/** Year color: the latest year uses the primary blue, each earlier year fades */
+/** Year color: the latest year uses full brand purple (the aggregate-traffic color), each earlier year fades */
 export function yearColor(orderFromLatest: number): string {
     const strengths = [100, 38, 20, 12];
     const s = strengths[Math.min(orderFromLatest, strengths.length - 1)];
-    return `color-mix(in srgb, ${palette.rx} ${s}%, transparent)`;
+    return `color-mix(in srgb, ${palette.brand} ${s}%, transparent)`;
 }
 
 /** Cumulative within a year: null before the first month; a month without records keeps the previous cumulative value (it is not dropped) */
@@ -115,7 +115,7 @@ export function buildYearOverYearChartData(model: YearOverYearModel, mode: Chart
             label: String(year),
             data: mode === 'cumulative' ? cumulativeYear(totals) : totals,
             borderColor: color,
-            backgroundColor: yi === latestIdx ? `color-mix(in srgb, ${palette.rx} 14%, transparent)` : 'transparent',
+            backgroundColor: yi === latestIdx ? `color-mix(in srgb, ${palette.brand} 14%, transparent)` : 'transparent',
             fill: yi === latestIdx,
             // Months without records are null: span the gaps, otherwise non-adjacent months stay isolated
             // and the whole line becomes invisible

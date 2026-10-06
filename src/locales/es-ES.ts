@@ -135,8 +135,6 @@ export default {
             chartTitle: 'Tendencia del tráfico',
             peak: 'Hora punta',
             trend: 'Hora actual vs. hora anterior',
-            sideAvg: 'Duración total',
-            sidePeak: 'Pico',
             /** Formatos de fecha/hora mostrados (tokens de dayjs), definidos por idioma para que las marcas sigan el idioma de la interfaz */
             format: {
                 tooltip: 'D MMM YYYY [a las] H',
@@ -150,8 +148,6 @@ export default {
             chartTitle: 'Tendencia del tráfico',
             avg: 'Tráfico medio diario',
             trend: 'Hoy vs. ayer',
-            sideAvg: 'Media diaria',
-            sidePeak: 'Día pico',
             /** Formatos de fecha/hora mostrados (tokens de dayjs), definidos por idioma para que las marcas sigan el idioma de la interfaz */
             format: {
                 tooltip: 'D MMM YYYY',
@@ -166,8 +162,6 @@ export default {
             avg: 'Tráfico medio mensual',
             peak: 'Mes pico',
             trend: 'Este mes vs. mes pasado',
-            sideAvg: 'Media mensual',
-            sidePeak: 'Mes pico',
             /** Formatos de fecha/hora mostrados (tokens de dayjs), definidos por idioma para que las marcas sigan el idioma de la interfaz */
             format: {
                 tooltip: 'MMM YYYY',
@@ -182,8 +176,6 @@ export default {
             avg: 'Tráfico medio anual',
             peak: 'Año pico',
             trend: 'Este año vs. año pasado',
-            sideAvg: 'Media anual',
-            sidePeak: 'Año pico',
             /** Formatos de fecha/hora mostrados (tokens de dayjs), definidos por idioma para que las marcas sigan el idioma de la interfaz */
             format: {
                 tooltip: 'YYYY',
@@ -223,7 +215,6 @@ export default {
         },
         panel: {
             composition: 'Composición del tráfico',
-            details: 'Detalles',
         },
         table: {
             detailTitle: 'Detalles de datos',
@@ -280,11 +271,6 @@ export default {
                 month: 'Este mes vs. mes pasado',
                 year: 'Este año vs. año pasado',
             },
-        },
-        side: {
-            total: 'Total',
-            duration: '{count} h',
-            rxShare: 'Porcentaje de RX',
         },
         table: {
             columns: {
@@ -369,7 +355,7 @@ export default {
         compact: {
             title: 'Últimas 24 horas',
             total: 'Total',
-            bandwidthUsage: 'Uso de ancho de banda',
+            vsRecentPeak: 'Vs. pico de 3 h',
         },
         chart: {
             title: 'Velocidad en directo',
@@ -523,11 +509,6 @@ export default {
         },
         donut: {
             title: 'Distribución del tráfico',
-        },
-        side: {
-            details: 'Detalles',
-            count: 'Registros',
-            rxShare: 'Porcentaje de RX',
         },
         table: {
             title: 'Detalles de la clasificación',

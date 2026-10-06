@@ -446,7 +446,9 @@ watch(unitMode, (newMode) => {
 }
 .s2-rt-line :deep(.u-chart-maxlabel.tx) {
     top: auto;
-    bottom: 26px;
+    /* The x axis occupies the bottom 30px of the container (uplotConfig axis size); anchor above
+       it with a small gap so the label never sits on the "-60s" tick */
+    bottom: 34px;
     color: var(--tx, #0c9450);
 }
 </style>
