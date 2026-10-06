@@ -20,6 +20,7 @@
                     :style="panelStyle"
                     role="menu"
                     @keydown="onPanelKeydown"
+                    @pointerdown="onPanelPointerDown"
                     @mouseenter="cancelPendingClose"
                     @mouseleave="onRootLeave"
                 >
@@ -31,7 +32,7 @@
                         :class="{ 's2-dropdown-item--active': opt.key === activeKey }"
                         role="menuitem"
                         :aria-current="opt.key === activeKey ? 'true' : undefined"
-                        @click="choose(opt.key)"
+                        @click="choose(opt.key, $event)"
                     >
                         <span v-if="opt.icon" class="s2-dropdown-item-icon"><MenuIcon :icon="opt.icon" /></span>
                         <span class="s2-dropdown-item-label">{{ opt.label }}</span>
@@ -148,6 +149,7 @@ function position() {
 }
 
 async function openPanel(focusFirst = false) {
+    pointerDownInPanel = false;
     open.value = true;
     await nextTick();
     position();
@@ -160,7 +162,13 @@ async function openPanel(focusFirst = false) {
 
 function close() {
     cancelPendingClose();
+    pointerDownInPanel = false;
     open.value = false;
+}
+
+/** Arms item selection for this opening. Keyboard activation never produces one of these. */
+function onPanelPointerDown() {
+    pointerDownInPanel = true;
 }
 
 function toggle() {
@@ -232,6 +240,17 @@ function onRootClick(e: MouseEvent) {
 
 let closeTimer: ReturnType<typeof setTimeout> | null = null;
 
+/**
+ * True once a pointerdown has landed inside this opening of the panel.
+ *
+ * iPad Safari turns one tap into mouseenter followed by click, and retargets that click onto
+ * whatever the mouseenter just revealed. The first row of a hover menu sits beside the trigger,
+ * so the tap that opened it selects "hourly" before the menu is ever seen. The pointerdown of
+ * that tap already hit the trigger, while the panel did not exist yet; a real choice, mouse or
+ * finger, starts with a pointerdown on the panel itself.
+ */
+let pointerDownInPanel = false;
+
 function cancelPendingClose() {
     if (closeTimer) {
         clearTimeout(closeTimer);
@@ -255,7 +274,10 @@ function onRootLeave() {
     }, HOVER_LEAVE_GRACE);
 }
 
-function choose(key: string) {
+function choose(key: string, event: MouseEvent) {
+    // detail 0 is Enter/Space on the focused item. Leaving the panel open is what makes the
+    // opening tap useful: the menu is now on screen for the next tap.
+    if (props.openOnHover && event.detail !== 0 && !pointerDownInPanel) return;
     close();
     // Selection dismisses the menu, so focus goes back to the trigger (keyboard users keep
     // their place; pointer interaction never shows a focus ring thanks to :focus-visible)
