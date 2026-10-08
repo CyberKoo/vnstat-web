@@ -7,6 +7,7 @@
                 :formatted-now="formattedNow"
                 :interface-name="interfaceName"
                 :total-samples="totalSamples"
+                :connected="liveConnected"
             />
         </div>
 
@@ -92,7 +93,7 @@ const { linkSpeed, loading: linkSpeedLoading } = storeToRefs(linkSpeedStore);
 // ── composables ──
 const dayjs = useDayjs();
 
-const { usage: liveUsage, latest: latestTraffic } = useLiveNetworkStats(
+const { usage: liveUsage, latest: latestTraffic, connected: liveConnected } = useLiveNetworkStats(
     toRef(interfaceStore, 'selected'),
     APP_MAX_POINTS,
 );

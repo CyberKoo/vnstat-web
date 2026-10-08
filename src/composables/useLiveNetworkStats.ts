@@ -35,6 +35,32 @@ export function useLiveNetworkStats(
     // Reactive ref for the latest traffic entry (hot path, zero-copy)
     const latest = shallowRef<TimedNetworkStats | null>(null);
 
+    /**
+     * True while frames are arriving. EventSource fires error on every reconnect, which would
+     * flicker a flag tied to readyState; a frame within the last few seconds is the signal
+     * the numbers on screen are actually live.
+     */
+    const connected = shallowRef(false);
+    const CONNECTED_TTL_MS = 3_000;
+    let connectedTimer: number | null = null;
+
+    function noteFrame() {
+        connected.value = true;
+        if (connectedTimer !== null) window.clearTimeout(connectedTimer);
+        connectedTimer = window.setTimeout(() => {
+            connected.value = false;
+            connectedTimer = null;
+        }, CONNECTED_TTL_MS);
+    }
+
+    function clearConnected() {
+        if (connectedTimer !== null) {
+            window.clearTimeout(connectedTimer);
+            connectedTimer = null;
+        }
+        connected.value = false;
+    }
+
     // SSE instance for receiving real-time backend traffic data
     let eventSource: SseClient | null = null;
 
@@ -76,6 +102,7 @@ export function useLiveNetworkStats(
             // Push to buffer (also updates latest ref)
             buffer.push(entry);
             latest.value = entry;
+            noteFrame();
         }
     };
 
@@ -96,6 +123,7 @@ export function useLiveNetworkStats(
      */
     function open(interfaceName: string) {
         clearShutdownReconnectTimer();
+        clearConnected();
 
         if (eventSource) {
             eventSource.close();
@@ -133,6 +161,7 @@ export function useLiveNetworkStats(
      */
     function close() {
         clearShutdownReconnectTimer();
+        clearConnected();
         if (eventSource) eventSource.close();
     }
 
@@ -194,6 +223,8 @@ export function useLiveNetworkStats(
         usage,
         /** Latest traffic data entry */
         latest,
+        /** Whether the live SSE stream is currently open */
+        connected,
         /** Open SSE connection for the given interface */
         open,
         /** Close current SSE connection */

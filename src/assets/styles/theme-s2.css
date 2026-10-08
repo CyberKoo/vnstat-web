@@ -903,7 +903,34 @@ body::before {
     padding-left: calc(var(--s2-menu-pad-left, 16px) + var(--s2-menu-indent, 16px));
 }
 
-/* Collapsed sider: icon only, centred in the 56px rail */
+/* Collapsed sider: icon only, centred in the 56px rail.
+   The active chip is one element on the nav that slides between rows (see .s2-menu-slider),
+   so the per-row pill stays clear here and only the icon color marks the current item. */
+.s2-menu-nav--collapsed {
+    position: relative;
+}
+
+.s2-menu-slider {
+    position: absolute;
+    top: 0;
+    left: 8px;
+    right: 8px;
+    border-radius: var(--s2-radius-sm);
+    background: var(--s2-nav-active-bg);
+    pointer-events: none;
+}
+
+.s2-menu-slider--move {
+    transition: transform var(--s2-transition);
+}
+
+.s2-menu--collapsed .s2-menu-row--active::before,
+.s2-menu--collapsed .s2-menu-row--active:hover::before,
+.s2-menu--collapsed .s2-menu-row--group-active::before,
+.s2-menu--collapsed .s2-menu-row--group-active:hover::before {
+    background: transparent;
+}
+
 .s2-menu--collapsed .s2-menu-label,
 .s2-menu--collapsed .s2-menu-arrow {
     display: none;

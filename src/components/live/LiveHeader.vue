@@ -1,11 +1,18 @@
 <template>
     <div class="s2-metric-band">
         <div class="s2-metric">
-            <div class="s2-stat-value s2-stat-value--rx s2-live-value">{{ liveUsage.rx.formatted }}</div>
-            <div class="s2-stat-label">{{ t('live.header.rxLabel') }}</div>
+            <div class="s2-stat-value s2-stat-value--rx s2-live-value">
+                {{ liveUsage.rx.formatted }}
+            </div>
+            <div class="s2-stat-label s2-live-rx-label">
+                {{ t('live.header.rxLabel') }}
+                <span v-if="connected" class="s2-live-dot" aria-hidden="true" />
+            </div>
         </div>
         <div class="s2-metric">
-            <div class="s2-stat-value s2-stat-value--tx s2-live-value">{{ liveUsage.tx.formatted }}</div>
+            <div class="s2-stat-value s2-stat-value--tx s2-live-value">
+                {{ liveUsage.tx.formatted }}
+            </div>
             <div class="s2-stat-label">{{ t('live.header.txLabel') }}</div>
         </div>
         <div class="s2-metric">
@@ -34,13 +41,18 @@ import { formatNumber } from '@/utils/numbers';
 
 const { t } = useI18n();
 
-defineProps<{
-    liveUsage: { rx: { formatted: string }; tx: { formatted: string } };
-    todayTotal: string;
-    formattedNow: string;
-    interfaceName: string;
-    totalSamples: number;
-}>();
+withDefaults(
+    defineProps<{
+        liveUsage: { rx: { formatted: string }; tx: { formatted: string } };
+        todayTotal: string;
+        formattedNow: string;
+        interfaceName: string;
+        totalSamples: number;
+        /** SSE is open. The RX dot breathes only while this is true. */
+        connected?: boolean;
+    }>(),
+    { connected: false },
+);
 </script>
 
 <style scoped>
@@ -68,6 +80,37 @@ defineProps<{
 .s2-live-meta-line .mono {
     color: var(--s2-text);
     font-weight: 500;
+}
+
+/* One living mark on the page: a 6px RX dot, only while the stream is open. */
+.s2-live-rx-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.s2-live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--rx);
+    animation: s2-live-dot 2.4s ease-in-out infinite;
+}
+
+@keyframes s2-live-dot {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .s2-live-dot {
+        animation: none;
+    }
 }
 
 @media (--mobile) {

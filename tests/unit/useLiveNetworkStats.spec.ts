@@ -84,6 +84,31 @@ afterEach(() => {
 });
 
 describe('useLiveNetworkStats', () => {
+    it('stays connected while frames arrive and drops once they stop', () => {
+        const { stats } = mountComposable();
+        const client = sseInstances[0];
+        expect(stats.connected.value).toBe(false);
+
+        vi.useFakeTimers();
+        client.opts.onMessage?.(sseMessage(JSON.stringify(validStats()), '1700000000'));
+        expect(stats.connected.value).toBe(true);
+
+        vi.advanceTimersByTime(2_999);
+        expect(stats.connected.value).toBe(true);
+        vi.advanceTimersByTime(1);
+        expect(stats.connected.value).toBe(false);
+        vi.useRealTimers();
+    });
+
+    it('clears the live flag immediately when the stream is closed', () => {
+        const { stats } = mountComposable();
+        const client = sseInstances[0];
+        client.opts.onMessage?.(sseMessage(JSON.stringify(validStats()), '1700000000'));
+        expect(stats.connected.value).toBe(true);
+        stats.close();
+        expect(stats.connected.value).toBe(false);
+    });
+
     it('opens an SseClient for the selected interface on mount', () => {
         mountComposable();
 

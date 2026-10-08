@@ -50,6 +50,31 @@ describe('live count localization', () => {
         }
     });
 
+    it('shows the live dot only while connected and updates a rate without a settle class', async () => {
+        setI18nLocale('en-US');
+        const wrapper = mount(LiveHeader, {
+            props: {
+                liveUsage: { rx: { formatted: '-' }, tx: { formatted: '-' } },
+                todayTotal: '1 GiB',
+                formattedNow: '1:00 PM',
+                interfaceName: 'eth0',
+                totalSamples: 1,
+                connected: false,
+            },
+            global: { plugins: [i18n] },
+        });
+        wrappers.push(wrapper);
+
+        expect(wrapper.find('.s2-live-dot').exists()).toBe(false);
+        await wrapper.setProps({ connected: true });
+        expect(wrapper.find('.s2-live-dot').exists()).toBe(true);
+
+        await wrapper.setProps({ liveUsage: { rx: { formatted: '2 Mbps' }, tx: { formatted: '-' } } });
+        expect(wrapper.find('.s2-stat-value--rx').text()).toBe('2 Mbps');
+        expect(wrapper.find('.s2-stat-value--rx').classes()).not.toContain('s2-live-settle');
+        expect(wrapper.find('.s2-stat-value--tx').classes()).not.toContain('s2-live-settle');
+    });
+
     it('switches uptime plurals without new traffic and preserves unavailable uptime', async () => {
         setI18nLocale('en-US');
         const wrapper = mount(LiveChartArea, {
