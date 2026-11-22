@@ -78,12 +78,7 @@
                     <tbody>
                         <tr v-for="(row, i) in tableData" :key="row.timestamp">
                             <td class="s2-rank">
-                                <span
-                                    class="s2-rank-badge"
-                                    :class="{ 's2-rank-badge--top': i < 3 }"
-                                    :style="i < 3 ? { color: RANK_COLORS[i] } : undefined"
-                                    >{{ i + 1 }}</span
-                                >
+                                <span class="s2-rank-badge" :class="{ 's2-rank-badge--top': i < 3 }">{{ i + 1 }}</span>
                             </td>
                             <th scope="row">{{ row.time }}</th>
                             <td v-for="col in dataColumns" :key="col.key">{{ row[col.key] }}</td>
@@ -345,7 +340,11 @@ const dataColumns = computed(() => tableColumns.value.slice(1));
     gap: 6px;
 }
 
-/* Top three badges: leading dot, color bound by the inline style */
+.s2-rank-badge--top {
+    color: var(--brand-text);
+}
+
+/* Top three badges use the same brand family as the ranking bars. */
 .s2-rank-badge--top::before {
     content: '';
     width: 6px;

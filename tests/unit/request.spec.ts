@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import request from '@/api/request';
+import { API_BASE_URL } from '@/config';
 
 function jsonResponse(body: unknown, init: { status?: number; statusText?: string } = {}) {
     return new Response(JSON.stringify(body), {
@@ -97,5 +98,13 @@ describe('request', () => {
         await request({ url: '/x', method: 'get', data: { foo: 1 } });
         const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
         expect(init.body).toBeUndefined();
+    });
+
+    it('builds the URL from the shared base path, the same one the SSE client uses', async () => {
+        // The REST layer and the SSE client both read @/config, so they cannot drift apart
+        fetchMock.mockResolvedValue(jsonResponse({ status: 'success', data: [] }));
+        await request({ url: '/interfaces' });
+        const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
+        expect(url).toBe(`${API_BASE_URL}/interfaces`);
     });
 });

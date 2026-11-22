@@ -170,10 +170,6 @@ import { featureGroups, techStack, links } from '@/data/about';
     justify-content: center;
     color: var(--brand);
     background: var(--brand-soft);
-    transition: transform var(--s2-transition);
-}
-.s2-feature-row:hover .s2-feature-chip {
-    transform: translateY(-1px);
 }
 
 .s2-feature-label {
@@ -181,10 +177,6 @@ import { featureGroups, techStack, links } from '@/data/about';
     font-weight: 500;
     color: var(--s2-text);
     line-height: 28px;
-    transition: color var(--s2-transition);
-}
-.s2-feature-row:hover .s2-feature-label {
-    color: var(--brand);
 }
 .s2-feature-desc {
     font-size: 11px;
@@ -207,9 +199,6 @@ import { featureGroups, techStack, links } from '@/data/about';
     color: var(--s2-text);
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
     transition: border-color var(--s2-transition);
-}
-.s2-tech-tag:hover {
-    border-color: var(--brand);
 }
 .s2-tech-tag svg {
     flex-shrink: 0;
@@ -243,7 +232,7 @@ import { featureGroups, techStack, links } from '@/data/about';
 .s2-link-row:hover {
     background: var(--s2-hover-bg);
     border-left-color: var(--brand);
-    color: var(--brand);
+    color: var(--brand-text);
 }
 .s2-link-row:hover svg {
     color: var(--brand);

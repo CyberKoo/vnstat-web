@@ -1,9 +1,10 @@
-import { onMounted, onScopeDispose, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 
 import { getInterfacesStats, getInterfacesSummary } from '@/api/interfaces';
 import { getInterfaceDetailCached } from '@/composables/useInterfaceDetailCache';
 import { useDayjs } from '@/composables/useDayjs';
 import { usePoll } from '@/composables/usePoll';
+import { useStaleGuard } from '@/composables/useStaleGuard';
 import { useToast } from '@/composables/useToast';
 import { extractTodayProgress, type TodayProgress } from '@/composables/useTodayProgress';
 import { i18n } from '@/plugins/i18n';
@@ -73,15 +74,8 @@ export function useInterfaceOverview(options: UseInterfaceOverviewOptions = {}) 
     /** Today's date key (updated along with the polling refresh) */
     const todayKey = () => dayjs().format('YYYY-MM-DD');
 
-    /** Sparkline fetch generation: once a new round starts, late results from the previous round are discarded */
-    let sparkEpoch = 0;
-
-    /** Whether the owning scope is gone: all late results are ignored after that */
-    let disposed = false;
-
-    onScopeDispose(() => {
-        disposed = true;
-    });
+    /** Guard against late results: once a new round starts, the results of the previous one are discarded */
+    const guard = useStaleGuard();
 
     /**
      * Concurrently fetch the 7 day traffic detail for the first {@link SPARKLINE_MAX_INTERFACES}
@@ -93,7 +87,7 @@ export function useInterfaceOverview(options: UseInterfaceOverviewOptions = {}) 
      * written into the state.
      */
     async function loadSparklines(list: InterfaceSummary[]) {
-        const epoch = ++sparkEpoch;
+        const isCurrent = guard.begin();
         const targets = list.slice(0, SPARKLINE_MAX_INTERFACES);
         // Interfaces that already have data update silently, avoiding a periodic skeleton flicker
         for (const item of targets) {
@@ -103,13 +97,13 @@ export function useInterfaceOverview(options: UseInterfaceOverviewOptions = {}) 
             targets.map(async (item) => {
                 try {
                     const detail = await getInterfaceDetailCached(item.name);
-                    if (disposed || epoch !== sparkEpoch) return;
+                    if (!isCurrent()) return;
                     // Take the rx+tx total series for the last 7 days
                     const series = detail.traffic.day.slice(-SPARKLINE_DAYS).map((day) => day.rx + day.tx);
                     sparklineState[item.name] = series.length >= 2 ? series : null;
                     todayProgressState[item.name] = extractTodayProgress(detail.traffic.day, todayKey());
                 } catch {
-                    if (disposed || epoch !== sparkEpoch) return;
+                    if (!isCurrent()) return;
                     sparklineState[item.name] = null;
                     todayProgressState[item.name] = null;
                 }

@@ -31,7 +31,7 @@ export interface PeriodTable {
  * @returns Date labels, columns and rows
  */
 export function usePeriodTable(data: PeriodDataContext): PeriodTable {
-    const { config, viewItems, tableLimit } = data;
+    const { config, allItems, tableLimit } = data;
     const { t } = useI18n();
     const { isMobile } = useMobile();
     const { formatSpeed } = useSpeedFormat();
@@ -40,7 +40,7 @@ export function usePeriodTable(data: PeriodDataContext): PeriodTable {
         const key = config.tableDateLabelFormatKey;
         // Yearly has no date labels
         if (!key) return undefined;
-        const items: TrafficItem[] = viewItems.value;
+        const items: TrafficItem[] = allItems.value;
         const sliced = items.slice(-tableLimit.value);
         return [...sliced]
             .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))
@@ -71,7 +71,7 @@ export function usePeriodTable(data: PeriodDataContext): PeriodTable {
     });
 
     const tableData = computed(() => {
-        const items: TrafficItem[] = viewItems.value;
+        const items: TrafficItem[] = allItems.value;
         return buildTrafficTable<TrafficItem>({
             items,
             limit: tableLimit.value,

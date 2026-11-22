@@ -41,4 +41,21 @@ export const palette = {
     sparklineBg: 'rgba(76, 111, 255, 0.10)',
 } as const;
 
+export const textPalette = {
+    light: {
+        brand: '#6a4ae8',
+        rx: '#3659d9',
+        tx: '#08783f',
+        accent: '#8a5200',
+        danger: '#b42318',
+    },
+    dark: {
+        brand: '#9178ff',
+        rx: '#91a5ff',
+        tx: '#4cc98a',
+        accent: '#e2a85a',
+        danger: '#ff8a80',
+    },
+} as const;
+
 export type PaletteColor = keyof typeof palette;

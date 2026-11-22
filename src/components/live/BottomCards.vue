@@ -1,7 +1,7 @@
 <template>
     <div class="s2-bottom">
         <div class="s2-bottom-col">
-            <h2 class="s2-bottom-label">{{ t('live.bottom.packetRate') }} &middot; PPS</h2>
+            <h2 class="s2-subsection-label">{{ t('live.bottom.packetRate') }} &middot; PPS</h2>
             <div class="s2-bottom-body s2-pps-body">
                 <div class="s2-ring-wrap s2-bottom-ring">
                     <Doughnut :data="ppsDonutData" :options="ppsDonutOptions" />
@@ -27,13 +27,13 @@
             </div>
         </div>
         <div class="s2-bottom-col">
-            <h2 class="s2-bottom-label">{{ t('live.bottom.trendTitle') }}</h2>
+            <h2 class="s2-subsection-label">{{ t('live.bottom.trendTitle') }}</h2>
             <div class="s2-bottom-body">
                 <Bar :data="miniBarData" :options="miniBarOptions" />
             </div>
         </div>
         <div class="s2-bottom-col s2-bottom-col--list">
-            <h2 class="s2-bottom-label s2-bottom-label--split">
+            <h2 class="s2-subsection-label s2-subsection-label--split">
                 <span>{{ t('live.bottom.top5Title') }}</span>
                 <span class="s2-top5-key">
                     <i class="s2-top5-dot s2-top5-dot--rx" />{{ t('common.rx')
@@ -98,7 +98,7 @@ function totalOf(item: Top5Item) {
 
 const maxTotal = computed(() => Math.max(0, ...props.top5.map(totalOf)));
 
-/** Accent colors for the top three rank badges (consistent with the TopTraffic ranking: 1st accent, 2nd brand, 3rd tx), the rest muted */
+/** Brand-tinted backgrounds for the top three rank badges, matching the TopTraffic color family */
 const RANK_CLASSES = ['r1', 'r2', 'r3'] as const;
 function rankClass(index: number) {
     return RANK_CLASSES[index] ?? '';
@@ -144,19 +144,8 @@ function segStyle(item: Top5Item, part: 'rx' | 'tx') {
     border-left: none;
 }
 
-.s2-bottom-label {
-    font-family: var(--font-sans);
-    font-size: 12px;
-    color: var(--s2-text-muted);
-    /* h2 carries a UA block-start margin; pin it to 0 so the tag swap changes nothing visually */
-    margin-top: 0;
-    margin-bottom: 8px;
-    font-weight: 500;
-    flex-shrink: 0;
-}
-
 /* Title row carries the legend: title on the left, rx/tx color keys on the right */
-.s2-bottom-label--split {
+.s2-subsection-label--split {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -167,7 +156,7 @@ function segStyle(item: Top5Item, part: 'rx' | 'tx') {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 400;
     white-space: nowrap;
 }
@@ -264,16 +253,9 @@ function segStyle(item: Top5Item, part: 'rx' | 'tx') {
     display: flex;
     align-items: center;
     gap: 9px;
-    cursor: default;
-    border-radius: var(--s2-radius-xs);
-    transition: background-color var(--s2-transition);
 }
 
-.s2-top5-item:hover {
-    background: var(--s2-hover-bg);
-}
-
-/* Rank badge: top three get their own colors, ranks 4-5 muted */
+/* Rank badge: the top three share the brand hue, ranks 4-5 stay muted */
 .s2-top5-rank {
     width: 18px;
     height: 18px;
@@ -290,19 +272,22 @@ function segStyle(item: Top5Item, part: 'rx' | 'tx') {
     transition: background-color var(--s2-transition);
 }
 
-.s2-top5-rank.r1 {
-    color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
+.s2-top5-rank.r1,
+.s2-top5-rank.r2,
+.s2-top5-rank.r3 {
+    color: var(--brand-text);
 }
 
-.s2-top5-rank.r2 {
-    color: var(--brand);
+.s2-top5-rank.r1 {
     background: var(--brand-bg);
 }
 
+.s2-top5-rank.r2 {
+    background: color-mix(in srgb, var(--brand) 8%, transparent);
+}
+
 .s2-top5-rank.r3 {
-    color: var(--tx);
-    background: color-mix(in srgb, var(--tx) 12%, transparent);
+    background: var(--brand-soft);
 }
 
 .s2-top5-main {

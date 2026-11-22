@@ -1,9 +1,5 @@
 <template>
-    <nav
-        ref="menuEl"
-        :aria-label="t('layout.mainNav')"
-        :class="{ 's2-menu-nav--collapsed': collapsed }"
-    >
+    <nav ref="menuEl" :aria-label="t('layout.mainNav')" :class="{ 's2-menu-nav--collapsed': collapsed }">
         <span
             v-if="collapsed && sliderPlaced"
             class="s2-menu-slider"

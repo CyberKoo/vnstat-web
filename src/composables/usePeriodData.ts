@@ -1,6 +1,6 @@
 import { computed, type ComputedRef } from 'vue';
 
-import { useInterfaceDetailStore } from '@/stores/interfaceDetail';
+import { useInterfaceDetailStore, type InterfaceDetailSource } from '@/stores/interfaceDetail';
 import { useMobile, useViewportWidth } from '@/composables/useMobile';
 import { PERIOD_CONFIGS, type PeriodConfig, type PeriodType } from '@/config/trafficPeriods';
 import type { TrafficItem, VnstatInterfaceDetail } from '@/types/network';
@@ -19,8 +19,6 @@ export interface PeriodDataContext {
     config: PeriodConfig;
     /** Full data for the current period (unfiltered) */
     allItems: ComputedRef<TrafficItem[]>;
-    /** Data for the current period (identical to allItems; kept as the slice the page renders) */
-    viewItems: ComputedRef<TrafficItem[]>;
     /** Full day data (used by the previous compare window and the ghost line) */
     allDayItems: ComputedRef<TrafficItem[]>;
     /** Full month data (drives the year-over-year model) */
@@ -38,12 +36,6 @@ export interface PeriodDataContext {
     /** Detail of the currently selected interface, for top-record comparisons */
     detail: ComputedRef<VnstatInterfaceDetail | null>;
 }
-
-/**
- * The slice of the interface detail store this composable reads, narrowed to the one field so
- * callers (and tests) can pass a plain object instead of standing up Pinia.
- */
-export type InterfaceDetailSource = Pick<ReturnType<typeof useInterfaceDetailStore>, 'value'>;
 
 /**
  * Selects and window the traffic rows for a period page.
@@ -91,21 +83,18 @@ export function usePeriodData(
         return isMobile.value ? limits.mobile : limits.default;
     });
 
-    /** Full data for the current period (for the previous compare window and the ghost line) */
-    const allItems = computed<TrafficItem[]>(() => interfaceDetailStore.value?.traffic?.[config.dataField] ?? []);
-
     /** Data for the current period (what the page renders) */
-    const viewItems = allItems;
+    const allItems = computed<TrafficItem[]>(() => interfaceDetailStore.value?.traffic?.[config.dataField] ?? []);
 
     const allDayItems = computed<TrafficItem[]>(() => interfaceDetailStore.value?.traffic?.day ?? []);
     const allMonthItems = computed<TrafficItem[]>(() => interfaceDetailStore.value?.traffic?.month ?? []);
 
     /** Data for the current period, truncated to the stats window (for stats/donut/side panel) */
-    const statsItems = computed<TrafficItem[]>(() => viewItems.value.slice(-statsLimit.value));
+    const statsItems = computed<TrafficItem[]>(() => allItems.value.slice(-statsLimit.value));
 
     /** Chart data (truncated to chartDisplayLimit) */
     const chartItems = computed<TrafficItem[]>(() => {
-        const items = viewItems.value;
+        const items = allItems.value;
         const limit = chartDisplayLimit.value;
         return limit > 0 ? items.slice(-limit) : items;
     });
@@ -116,7 +105,6 @@ export function usePeriodData(
         period,
         config,
         allItems,
-        viewItems,
         allDayItems,
         allMonthItems,
         statsItems,

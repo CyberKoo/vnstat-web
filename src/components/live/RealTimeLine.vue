@@ -400,7 +400,7 @@ watch(unitMode, (newMode) => {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.06em;
     pointer-events: none;
@@ -410,11 +410,11 @@ watch(unitMode, (newMode) => {
 }
 .s2-rt-line :deep(.u-axis-label.rx) {
     left: 4px;
-    color: var(--rx, #4c6fff);
+    color: var(--rx-text);
 }
 .s2-rt-line :deep(.u-axis-label.tx) {
     left: 4px;
-    color: var(--tx, #0c9450);
+    color: var(--tx-text);
 }
 
 .s2-rt-line-wrap {
@@ -428,7 +428,7 @@ watch(unitMode, (newMode) => {
     position: absolute;
     top: 4px;
     left: 6px;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     font-family: var(--font-sans, 'Inter', sans-serif);
     letter-spacing: 0.02em;
@@ -442,13 +442,13 @@ watch(unitMode, (newMode) => {
         0 0 4px var(--s2-card, #fff);
 }
 .s2-rt-line :deep(.u-chart-maxlabel.rx) {
-    color: var(--rx, #4c6fff);
+    color: var(--rx-text);
 }
 .s2-rt-line :deep(.u-chart-maxlabel.tx) {
     top: auto;
-    /* The x axis occupies the bottom 30px of the container (uplotConfig axis size); anchor above
+    /* The x axis occupies the bottom 32px of the container (uplotConfig axis size); anchor above
        it with a small gap so the label never sits on the "-60s" tick */
-    bottom: 34px;
-    color: var(--tx, #0c9450);
+    bottom: 36px;
+    color: var(--tx-text);
 }
 </style>

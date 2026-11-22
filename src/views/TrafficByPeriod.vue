@@ -398,7 +398,7 @@ function clearQuota() {
 }
 .s2-drill-btn:hover:not(:disabled) {
     border-color: var(--brand);
-    color: var(--brand);
+    color: var(--brand-text);
     background: var(--s2-hover-bg);
 }
 
@@ -487,7 +487,7 @@ function clearQuota() {
     color: var(--s2-text-muted);
 }
 .s2-quota-proj--over {
-    color: var(--danger);
+    color: var(--danger-text);
     font-weight: 600;
 }
 
@@ -562,7 +562,7 @@ function clearQuota() {
 }
 .s2-quota-clear:hover:not(:disabled) {
     border-color: var(--danger);
-    color: var(--danger);
+    color: var(--danger-text);
 }
 /* disabled opacity/cursor come from the shared control-state rules in theme-s2.css */
 .s2-quota-state {

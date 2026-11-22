@@ -1,7 +1,7 @@
 import type { Ref } from 'vue';
 import uPlot from 'uplot';
 
-import { palette } from '@/config/colors';
+import { palette, textPalette } from '@/config/colors';
 import { i18n } from '@/plugins/i18n';
 import dayjs from '@/plugins/dayjs';
 import { hexToRgba } from '@/utils/color';
@@ -13,6 +13,9 @@ export interface UplotColors {
     tx: string;
     accent: string;
     danger: string;
+    rxText: string;
+    txText: string;
+    dangerText: string;
     text: string;
     grid: string;
     bg: string;
@@ -66,6 +69,7 @@ export interface BuildOptsParams {
  * Extract color values from the computed style of a DOM element.
  */
 export function getColors(containerRef: Ref<HTMLDivElement | undefined>, isDark: boolean): UplotColors {
+    const textColors = isDark ? textPalette.dark : textPalette.light;
     const el = containerRef.value;
     if (!el) {
         return {
@@ -73,9 +77,12 @@ export function getColors(containerRef: Ref<HTMLDivElement | undefined>, isDark:
             tx: palette.tx,
             accent: palette.accent,
             danger: palette.danger,
-            text: '#646c82',
+            rxText: textColors.rx,
+            txText: textColors.tx,
+            dangerText: textColors.danger,
+            text: isDark ? '#8b93a9' : '#646c82',
             grid: isDark ? 'rgba(255, 255, 255, 0.38)' : '#c2c2c2',
-            bg: '#fff',
+            bg: isDark ? '#151926' : '#fff',
             fontMono: 'monospace',
         };
     }
@@ -85,6 +92,9 @@ export function getColors(containerRef: Ref<HTMLDivElement | undefined>, isDark:
         tx: style.getPropertyValue('--tx').trim() || palette.tx,
         accent: style.getPropertyValue('--accent').trim() || palette.accent,
         danger: style.getPropertyValue('--danger').trim() || palette.danger,
+        rxText: style.getPropertyValue('--rx-text').trim() || textColors.rx,
+        txText: style.getPropertyValue('--tx-text').trim() || textColors.tx,
+        dangerText: style.getPropertyValue('--danger-text').trim() || textColors.danger,
         text: style.getPropertyValue('--s2-text-muted').trim() || (isDark ? '#8b93a9' : '#646c82'),
         grid: style.getPropertyValue('--s2-chart-grid').trim() || (isDark ? 'rgba(255, 255, 255, 0.38)' : '#c2c2c2'),
         bg: style.getPropertyValue('--s2-card').trim() || (isDark ? '#151926' : '#fff'),
@@ -229,11 +239,11 @@ export function buildOpts(params: BuildOptsParams): uPlot.Options {
     const now = Date.now();
     const minTs = (now - windowMs) / 1e3;
     const maxTs = now / 1e3;
-    const axisFont = '10px ' + colors.fontMono;
+    const axisFont = '12px ' + colors.fontMono;
     // Mobile axis slot: tick values are not drawn (each direction's span is shown by a floating label)
     const mobileAxisSize = 8;
     // Desktop gutter minimum; the real width is derived from the widest per-side tick label
-    const minAxisLabelWidth = 70;
+    const minAxisLabelWidth = 84;
 
     /** RX/TX area label elements (created on ready), repositioned on draw according to the zero line */
     let rxLabelEl: HTMLElement | null = null;
@@ -364,7 +374,7 @@ export function buildOpts(params: BuildOptsParams): uPlot.Options {
 
         // ── Threshold lines: one per direction, normalized by that direction's span and share ──
         if (ov.thresholdBps != null && ov.thresholdBps > 0) {
-            ctx.font = `600 10px ${colors.fontMono}`;
+            ctx.font = `600 12px ${colors.fontMono}`;
             // The y-tick labels left textAlign at 'right', but labelX below is the label's left edge
             ctx.textAlign = 'left';
             const thr = ov.thresholdBps;
@@ -391,12 +401,12 @@ export function buildOpts(params: BuildOptsParams): uPlot.Options {
                 ctx.lineWidth = 3;
                 ctx.strokeStyle = colors.bg;
                 ctx.strokeText(label, labelX, labelY);
-                ctx.fillStyle = colors.danger;
+                ctx.fillStyle = colors.dangerText;
                 ctx.fillText(label, labelX, labelY);
             }
         }
 
-        ctx.font = `600 10px ${colors.fontMono}`;
+        ctx.font = `600 12px ${colors.fontMono}`;
         ctx.textAlign = 'left';
 
         // ── Vertical line at the selected replay moment + the rx/tx values at that moment ──
@@ -413,8 +423,8 @@ export function buildOpts(params: BuildOptsParams): uPlot.Options {
                 ctx.setLineDash([]);
 
                 const rows: Array<{ text: string; color: string }> = [{ text: fmtHM(ov.replayTs), color: colors.text }];
-                if (ov.replayRx != null) rows.push({ text: `↓ ${formatRate(ov.replayRx, 1)}`, color: colors.rx });
-                if (ov.replayTx != null) rows.push({ text: `↑ ${formatRate(ov.replayTx, 1)}`, color: colors.tx });
+                if (ov.replayRx != null) rows.push({ text: `↓ ${formatRate(ov.replayRx, 1)}`, color: colors.rxText });
+                if (ov.replayTx != null) rows.push({ text: `↑ ${formatRate(ov.replayTx, 1)}`, color: colors.txText });
 
                 const maxTw = Math.max(...rows.map((r) => ctx.measureText(r.text).width));
                 // When the vertical line is near the right edge, put the labels on its left to avoid
@@ -427,7 +437,7 @@ export function buildOpts(params: BuildOptsParams): uPlot.Options {
                     ctx.strokeText(row.text, lx, ly);
                     ctx.fillStyle = row.color;
                     ctx.fillText(row.text, lx, ly);
-                    ly += 13;
+                    ly += 16;
                 }
             }
         } else {
@@ -504,10 +514,10 @@ export function buildOpts(params: BuildOptsParams): uPlot.Options {
                 grid: { stroke: colors.grid, width: 1 },
                 ticks: { stroke: colors.text },
                 font: axisFont,
-                // uPlot places the label top at plotBottom + tickSize(10) + gap(5); the 10px mono
-                // font needs ~13px (ascent 10 + descent 3), so anything under ~28 cuts off the
+                // uPlot places the label top at plotBottom + tickSize(10) + gap(5); the 12px mono
+                // font needs ~15px (ascent 12 + descent 3), so anything under ~30 cuts off the
                 // bottom of the time labels
-                size: 30,
+                size: 32,
                 // Evenly spaced ticks: relative seconds in realtime mode (sliding with the window),
                 // localized time in replay mode
                 splits: (_self: uPlot, _axisIdx: number, scaleMin: number | null, scaleMax: number | null) => {
@@ -585,10 +595,10 @@ export function buildOpts(params: BuildOptsParams): uPlot.Options {
                     ttTime.className = 'u-tt-row u-tt-time';
                     const ttRx = document.createElement('div');
                     ttRx.className = 'u-tt-row';
-                    ttRx.style.color = colors.rx;
+                    ttRx.style.color = colors.rxText;
                     const ttTx = document.createElement('div');
                     ttTx.className = 'u-tt-row';
-                    ttTx.style.color = colors.tx;
+                    ttTx.style.color = colors.txText;
                     ttEl.append(ttTime, ttRx, ttTx);
                     self.over.appendChild(ttEl);
 

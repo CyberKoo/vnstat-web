@@ -1,7 +1,7 @@
 <template>
     <div class="s2-metric-band">
         <div class="s2-metric">
-            <div class="s2-stat-value s2-stat-value--rx s2-live-value">
+            <div class="s2-stat-value s2-stat-value--rx s2-stat-value--primary">
                 {{ liveUsage.rx.formatted }}
             </div>
             <div class="s2-stat-label s2-live-rx-label">
@@ -10,13 +10,13 @@
             </div>
         </div>
         <div class="s2-metric">
-            <div class="s2-stat-value s2-stat-value--tx s2-live-value">
+            <div class="s2-stat-value s2-stat-value--tx s2-stat-value--primary">
                 {{ liveUsage.tx.formatted }}
             </div>
             <div class="s2-stat-label">{{ t('live.header.txLabel') }}</div>
         </div>
         <div class="s2-metric">
-            <div class="s2-stat-value s2-live-value">{{ todayTotal }}</div>
+            <div class="s2-stat-value s2-stat-value--primary">{{ todayTotal }}</div>
             <div class="s2-stat-label">{{ t('live.header.todayTotal') }}</div>
         </div>
         <div class="s2-metric s2-live-meta">
@@ -56,11 +56,6 @@ withDefaults(
 </script>
 
 <style scoped>
-/* The homepage rate is the visual anchor, with a font size above the global .s2-stat-value default */
-.s2-live-value {
-    font-size: clamp(24px, 2.2vw, 34px);
-}
-
 /* Right meta: last metric slot, no divider, right-aligned muted small text */
 .s2-live-meta {
     border-left: none;
@@ -114,12 +109,6 @@ withDefaults(
 }
 
 @media (--mobile) {
-    /* Match the global 20px mobile stat value: an 11-char rate (e.g. "246.78 Kbps")
-       does not fit the 50%-wide metric card at 24px. */
-    .s2-live-value {
-        font-size: 20px;
-    }
-
     .s2-live-meta {
         text-align: left;
     }

@@ -93,10 +93,11 @@ const { linkSpeed, loading: linkSpeedLoading } = storeToRefs(linkSpeedStore);
 // ── composables ──
 const dayjs = useDayjs();
 
-const { usage: liveUsage, latest: latestTraffic, connected: liveConnected } = useLiveNetworkStats(
-    toRef(interfaceStore, 'selected'),
-    APP_MAX_POINTS,
-);
+const {
+    usage: liveUsage,
+    latest: latestTraffic,
+    connected: liveConnected,
+} = useLiveNetworkStats(toRef(interfaceStore, 'selected'), APP_MAX_POINTS);
 
 const { fiveMinTotal, todayTotal, monthlyTotal, grandTotal } = useSummaryData(detailRef);
 const interfaceMeta = useInterfaceMeta(detailRef);

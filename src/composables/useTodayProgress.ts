@@ -1,4 +1,4 @@
-import { dayKeyOf } from '@/composables/useAggregateTrend';
+import { dayKeyOf } from '@/utils/datetime';
 import type { TrafficItem } from '@/types/network';
 
 /** Statistics window in days for the daily average behind today's share ring */

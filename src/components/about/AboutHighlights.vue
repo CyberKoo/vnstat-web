@@ -70,7 +70,6 @@ const highlights = [
     flex: 1;
     min-width: 0;
     padding: 4px 20px;
-    cursor: default;
 }
 .s2-highlight-col:first-child {
     padding-left: 0;
@@ -93,26 +92,17 @@ const highlights = [
     color: var(--accent);
     background: color-mix(in srgb, var(--accent) 10%, transparent);
     margin-bottom: 12px;
-    transition: transform var(--s2-transition);
 }
 
 .s2-hl-label {
     font-size: 14px;
     font-weight: 600;
     color: var(--s2-text);
-    transition: color var(--s2-transition);
 }
 .s2-hl-desc {
     font-size: 12px;
     color: var(--s2-text-muted);
     margin-top: 3px;
-}
-/* Hover feedback: chip shifts slightly + title takes the accent color */
-.s2-highlight-col:hover .s2-hl-chip {
-    transform: translateY(-2px);
-}
-.s2-highlight-col:hover .s2-hl-label {
-    color: var(--accent);
 }
 
 /* The .s2-reveal rules live in theme-s2.css so every reveal target shares one definition */

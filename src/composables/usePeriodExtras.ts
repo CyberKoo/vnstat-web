@@ -60,7 +60,7 @@ export function usePeriodExtras(
     data: PeriodDataContext,
     settings: PeriodQuotaSettings = useSettingsStore(),
 ): PeriodExtras {
-    const { period, config, allItems, allDayItems, viewItems, statsItems, detail } = data;
+    const { period, config, allItems, allDayItems, statsItems, detail } = data;
     const { t } = useI18n();
     const dayjs = useDayjs();
     const { formatSpeed } = useSpeedFormat();
@@ -112,7 +112,7 @@ export function usePeriodExtras(
     // Peak period strip (hourly view only)
     const peakPeriods = computed(() => {
         if (!config.hasPeakStrip) return [];
-        const last24: TrafficItem[] = viewItems.value.slice(-24);
+        const last24: TrafficItem[] = allItems.value.slice(-24);
         if (!last24.length) return [];
         const sorted = [...last24].sort((a, b) => (b.rx ?? 0) + (b.tx ?? 0) - ((a.rx ?? 0) + (a.tx ?? 0)));
         return sorted.slice(0, 3).map((h) => ({

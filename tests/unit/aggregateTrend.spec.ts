@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildAggregateDailySeries, dayKeyOf } from '@/composables/useAggregateTrend';
+import { buildAggregateDailySeries } from '@/composables/useAggregateTrend';
+import { dayKeyOf } from '@/utils/datetime';
 import type { TrafficItem, VnstatInterfaceDetail } from '@/types/network';
 
 /** Build one daily traffic record (with a complete date field) */

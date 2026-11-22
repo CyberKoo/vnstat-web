@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/config';
 import type { JSendResponse } from '@/types/jsend';
 
 /**
@@ -6,8 +7,10 @@ import type { JSendResponse } from '@/types/jsend';
  * Always relative. The dev and preview servers proxy it to VITE_API_SERVER, and a production
  * deployment is expected to reverse-proxy it on the web server. VITE_API_SERVER is deliberately
  * never read here, so no build machine address can end up in a release bundle.
+ *
+ * The value comes from @/config — the same source the SSE client reads — so the REST calls and the
+ * live stream can never end up on different base paths.
  */
-const BASE_API = import.meta.env.VITE_APP_BASE_API || '/api/v1';
 
 /**
  * Request configuration.
@@ -73,7 +76,7 @@ async function request<T = unknown>(config: RequestConfig): Promise<T> {
     } = config;
 
     // Build the full URL
-    let fullUrl = `${BASE_API}${url}`;
+    let fullUrl = `${API_BASE_URL}${url}`;
     if (params) {
         const searchParams = new URLSearchParams();
         for (const [key, value] of Object.entries(params)) {

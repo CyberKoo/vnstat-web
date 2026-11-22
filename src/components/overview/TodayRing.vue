@@ -107,12 +107,12 @@ const ariaLabel = computed(() =>
     position: absolute;
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--s2-text);
 }
 
 .today-ring-val--over {
-    color: var(--accent);
+    color: var(--accent-text);
 }
 </style>

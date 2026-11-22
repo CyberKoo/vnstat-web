@@ -43,3 +43,11 @@ export const useInterfaceDetailStore = defineStore('interfaceDetail', () => {
         value: interfaceDetail,
     };
 });
+
+/**
+ * The slice of the interface detail store a composable reads, narrowed to the one field so callers
+ * (and tests) can pass a plain object instead of standing up Pinia.
+ *
+ * Declared next to the store it derives from, so every consumer shares one definition.
+ */
+export type InterfaceDetailSource = Pick<ReturnType<typeof useInterfaceDetailStore>, 'value'>;

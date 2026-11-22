@@ -1,7 +1,7 @@
 <template>
     <div class="s2-metric-band">
         <div v-for="stat in stats" :key="stat.label" class="s2-metric">
-            <div class="s2-metric-value" :style="stat.color ? { color: stat.color } : undefined">
+            <div class="s2-stat-value" :style="stat.color ? { color: stat.color } : undefined">
                 {{ stat.value }}
             </div>
             <Sparkline
@@ -35,20 +35,6 @@ defineProps<{
 </script>
 
 <style scoped>
-/* Values: the open metric band uses a larger font size (replacing the original s2-stat-value grid card dimensions) */
-.s2-metric-value {
-    font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums;
-    font-size: clamp(20px, 2vw, 30px);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-}
-
-.s2-metric .s2-stat-label {
-    margin-top: 4px;
-}
-
 .s2-metric-sparkline {
     width: 150px;
     max-width: 100%;
@@ -59,9 +45,6 @@ defineProps<{
 }
 
 @media (--mobile) {
-    .s2-metric-value {
-        font-size: 20px;
-    }
     .s2-metric-sparkline {
         width: 100%;
     }

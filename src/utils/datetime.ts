@@ -1,6 +1,8 @@
 import type { Dayjs, UnitType } from 'dayjs';
 
 import dayjs from '@/plugins/dayjs';
+import { MS_IN_SECOND } from '@/constants';
+import type { TrafficItem } from '@/types/network';
 
 /**
  * Computes the length of the interval between a given timestamp and the current time (or a given
@@ -70,4 +72,25 @@ export function computeInterval(
  */
 export function formatTimestamp(ts: number, fmt: string): string {
     return dayjs.unix(ts).format(fmt);
+}
+
+/**
+ * Date key of a traffic item (YYYY-MM-DD, local time zone).
+ *
+ * Prefers the date field provided by vnStat; when month/day are missing it falls back to deriving them
+ * from the timestamp.
+ *
+ * @param item Traffic data item
+ * @returns The date key (e.g. "2026-09-28")
+ */
+export function dayKeyOf(item: TrafficItem): string {
+    if (item.date && typeof item.date.month === 'number' && typeof item.date.day === 'number') {
+        const m = String(item.date.month).padStart(2, '0');
+        const d = String(item.date.day).padStart(2, '0');
+        return `${item.date.year}-${m}-${d}`;
+    }
+    const local = new Date(item.timestamp * MS_IN_SECOND);
+    const m = String(local.getMonth() + 1).padStart(2, '0');
+    const d = String(local.getDate()).padStart(2, '0');
+    return `${local.getFullYear()}-${m}-${d}`;
 }

@@ -97,7 +97,7 @@ const props = withDefaults(
 const dayjs = useDayjs();
 const { t, locale } = useI18n();
 
-/** Coupled with the CSS @media (--mobile) rule: cells are forced to 10px on mobile */
+/** Coupled with the CSS @media (--mobile) rule: cells are forced to 12px on mobile */
 const MOBILE_QUERY = `(max-width: ${BREAKPOINTS.MOBILE_MAX}px)`;
 const isMobileView = ref(false);
 let mediaQueryList: MediaQueryList | null = null;
@@ -175,7 +175,7 @@ const BASE_CELL_SIZE = 14;
 const MAX_CELL_SIZE = 32;
 
 const cellSize = computed(() => {
-    if (isMobileView.value) return 10;
+    if (isMobileView.value) return 12;
     const cols = columnCount.value;
     if (!containerWidth.value || cols === 0) return BASE_CELL_SIZE;
     // Available width = container - weekday label column (16) - gap between label column and grid (4); the pitch includes the 2px column gap
@@ -183,8 +183,8 @@ const cellSize = computed(() => {
     return Math.max(BASE_CELL_SIZE, Math.min(pitch - 2, MAX_CELL_SIZE));
 });
 
-/** Effective cell size (overridden to 10px by CSS on mobile) */
-const effectiveCellSize = computed(() => (isMobileView.value ? 10 : cellSize.value));
+/** Effective cell size (overridden to 12px by CSS on mobile) */
+const effectiveCellSize = computed(() => (isMobileView.value ? 12 : cellSize.value));
 
 /** Week column pitch = cell size + column gap (column gap is 1px on mobile) */
 const columnPitch = computed(() => effectiveCellSize.value + (isMobileView.value ? 1 : 2));
@@ -497,13 +497,13 @@ function getColorClass(value: number, maxVal: number): string {
 
 @media (--mobile) {
     .s2-heatmap-cell {
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
         border-radius: 1px;
     }
     .s2-legend-cell {
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
         border-radius: 1px;
     }
     .s2-heatmap-grid {
@@ -516,15 +516,15 @@ function getColorClass(value: number, maxVal: number): string {
         margin-left: 18px;
     }
     .s2-heatmap-weekday-label {
-        font-size: 8px;
-        height: 10px;
-        line-height: 10px;
+        font-size: 11px;
+        height: 12px;
+        line-height: 12px;
     }
     .s2-heatmap-month-label {
-        font-size: 9px;
+        font-size: 11px;
     }
     .s2-heatmap-wrapper {
-        --cell-size: 10px !important;
+        --cell-size: 12px !important;
     }
 }
 </style>

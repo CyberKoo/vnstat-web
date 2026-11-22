@@ -254,7 +254,7 @@ defineProps<{
         right: 4px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 600;
         color: var(--s2-text);
         white-space: nowrap;

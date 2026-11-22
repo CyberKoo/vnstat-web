@@ -58,10 +58,6 @@ import { pipelineSteps } from '@/data/about';
     justify-content: center;
     color: var(--accent);
     background: color-mix(in srgb, var(--accent) 10%, transparent);
-    transition: transform var(--s2-transition);
-}
-.s2-pipe-step:hover .s2-pipe-icon {
-    transform: translateY(-2px);
 }
 
 .s2-pipe-label {
@@ -69,10 +65,6 @@ import { pipelineSteps } from '@/data/about';
     font-weight: 600;
     color: var(--s2-text);
     margin-top: 10px;
-    transition: color var(--s2-transition);
-}
-.s2-pipe-step:hover .s2-pipe-label {
-    color: var(--accent);
 }
 
 .s2-pipe-desc {

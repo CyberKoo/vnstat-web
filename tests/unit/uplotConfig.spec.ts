@@ -239,6 +239,49 @@ describe('localized chart times with unchanged data', () => {
     );
 });
 
+describe('chart typography and semantic text colors', () => {
+    const overlay = (): UplotOverlay => ({
+        thresholdBps: null,
+        replayTs: null,
+        replayRx: null,
+        replayTx: null,
+        rxSpan: 100,
+        rxTicks: [0, 100],
+        txSpan: 50,
+        txTicks: [0, 50],
+        yShare: 2 / 3,
+    });
+
+    it('uses readable axis fonts with enough room for the labels', () => {
+        const opts = buildOpts({
+            width: 600,
+            height: 300,
+            isMobile: false,
+            isDark: false,
+            colors: getColors(ref(undefined), false),
+            formatRate: (v) => `${v}`,
+            containerRef: ref(document.createElement('div')),
+            windowMs: 60_000,
+            getOverlay: overlay,
+        });
+
+        expect(opts.axes?.[0]).toMatchObject({ font: '12px monospace', size: 32 });
+        expect(opts.axes?.[1]?.font).toBe('12px monospace');
+    });
+
+    it('keeps text colors separate from data graphics and adapts them to the theme', () => {
+        const light = getColors(ref(undefined), false);
+        const dark = getColors(ref(undefined), true);
+
+        expect(light.rxText).not.toBe(light.rx);
+        expect(light.txText).not.toBe(light.tx);
+        expect(light.dangerText).not.toBe(light.danger);
+        expect(dark.rxText).not.toBe(light.rxText);
+        expect(dark.txText).not.toBe(light.txText);
+        expect(dark.dangerText).not.toBe(light.dangerText);
+    });
+});
+
 describe('touch listener lifecycle', () => {
     const overlay = (): UplotOverlay => ({
         thresholdBps: null,

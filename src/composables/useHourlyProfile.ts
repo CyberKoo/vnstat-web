@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 
-import { useInterfaceDetailStore } from '@/stores/interfaceDetail';
+import { useInterfaceDetailStore, type InterfaceDetailSource } from '@/stores/interfaceDetail';
 import type { TrafficItem } from '@/types/network';
 import { MS_IN_SECOND } from '@/constants';
 
@@ -164,12 +164,6 @@ export function buildWeekHourMatrix(items: TrafficItem[], now: Date = new Date()
         );
     });
 }
-
-/**
- * The slice of the interface detail store this composable reads, narrowed to the one field so
- * callers (and tests) can pass a plain object instead of standing up Pinia.
- */
-export type InterfaceDetailSource = Pick<ReturnType<typeof useInterfaceDetailStore>, 'value'>;
 
 /**
  * Composable for the hourly traffic profile.

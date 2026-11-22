@@ -66,6 +66,13 @@
     --cyan: #06b6d4;
     --pink: #ec4899;
 
+    /* ── Semantic text colors (separate from data graphics) ── */
+    --brand-text: #6a4ae8;
+    --rx-text: #3659d9;
+    --tx-text: #08783f;
+    --accent-text: #8a5200;
+    --danger-text: #b42318;
+
     /* ── Canvas-rendered chart colors ──
        Chart.js paints on a <canvas>, so it cannot read the cascade. These tokens are the
        bridge: useChartTheme() samples them off <html> and hands the values to Chart.js.
@@ -146,6 +153,12 @@
     --s2-aurora-2: rgba(12, 148, 80, 0.26);
     --s2-aurora-3: rgba(180, 105, 0, 0.2);
     --s2-aurora-4: rgba(139, 92, 246, 0.3);
+
+    --brand-text: #9178ff;
+    --rx-text: #91a5ff;
+    --tx-text: #4cc98a;
+    --accent-text: #e2a85a;
+    --danger-text: #ff8a80;
 
     --s2-chart-text: #ffffff;
     --s2-chart-grid: rgba(255, 255, 255, 0.38);
@@ -338,6 +351,16 @@ body::before {
     font-weight: 400;
 }
 
+.s2-subsection-label {
+    margin-top: 0;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--s2-text-muted);
+}
+
 /* ── Section label with actions: hairline sits between the title and the actions, which always hug the right edge ── */
 .s2-section-label--with-actions {
     align-items: center;
@@ -422,24 +445,28 @@ body::before {
 .s2-stat-value {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    font-size: clamp(18px, 1.8vw, 28px);
+    font-size: clamp(20px, 1.8vw, 28px);
     font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1.1;
 }
 
+.s2-stat-value--primary {
+    font-size: clamp(22px, 2vw, 32px);
+}
+
 /* ── s2-stat-value color modifiers ── */
 .s2-stat-value--rx {
-    color: var(--rx);
+    color: var(--rx-text);
 }
 .s2-stat-value--tx {
-    color: var(--tx);
+    color: var(--tx-text);
 }
 .s2-stat-value--accent {
-    color: var(--accent);
+    color: var(--accent-text);
 }
 .s2-stat-value--brand {
-    color: var(--brand);
+    color: var(--brand-text);
 }
 
 .s2-stat-label {
@@ -716,7 +743,7 @@ body::before {
 }
 .s2-export-btn:hover:not(:disabled) {
     border-color: var(--brand);
-    color: var(--brand);
+    color: var(--brand-text);
     background: var(--s2-hover-bg);
 }
 
@@ -728,6 +755,7 @@ body::before {
 .s2-quota-clear:focus-visible,
 .s2-thr-clear:focus-visible,
 .s2-replay-exit:focus-visible,
+.s2-replay-slider:focus-visible,
 .s2-tool-btn:focus-visible,
 .s2-iface-icon-btn:focus-visible,
 .s2-sidebar-select:focus-visible,
@@ -1374,6 +1402,40 @@ body::before {
     .s2-loading-bar {
         animation: none;
         transform: scaleX(0.6);
+    }
+}
+
+@media (pointer: coarse) {
+    .s2-header-btn,
+    .s2-mobile-menu-btn,
+    .s2-menu-row,
+    .s2-dropdown-item,
+    .s2-seg-btn,
+    .s2-export-btn,
+    .s2-drill-btn,
+    .s2-quota-clear,
+    .s2-thr-clear,
+    .s2-replay-exit,
+    .s2-tool-btn,
+    .s2-iface-icon-btn,
+    .s2-sidebar-select,
+    .s2-quota-input,
+    .s2-thr-input,
+    .s2-breadcrumb-link,
+    .s2-link-row,
+    .s2-btn {
+        box-sizing: border-box;
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .s2-dropdown-item {
+        line-height: 44px;
+    }
+
+    .s2-breadcrumb-link {
+        display: inline-flex;
+        align-items: center;
     }
 }
 

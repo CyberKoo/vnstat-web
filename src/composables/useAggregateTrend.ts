@@ -1,33 +1,13 @@
-import { computed, onScopeDispose, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import { getInterfaces } from '@/api/interfaces';
 import { getInterfaceDetailCached } from '@/composables/useInterfaceDetailCache';
-import { MS_IN_SECOND } from '@/constants';
-import type { TrafficItem, VnstatInterfaceDetail } from '@/types/network';
+import { useStaleGuard } from '@/composables/useStaleGuard';
+import { dayKeyOf } from '@/utils/datetime';
+import type { VnstatInterfaceDetail } from '@/types/network';
 
 /** Aggregate trend window (days), matching the section title "the latest 30 days" */
 export const AGGREGATE_WINDOW_DAYS = 30;
-
-/**
- * Date key of a traffic item (YYYY-MM-DD, local time zone).
- *
- * Prefers the date field provided by vnStat; when month/day are missing it falls back to deriving them
- * from the timestamp.
- *
- * @param item Traffic data item
- * @returns The date key (e.g. "2026-09-28")
- */
-export function dayKeyOf(item: TrafficItem): string {
-    if (item.date && typeof item.date.month === 'number' && typeof item.date.day === 'number') {
-        const m = String(item.date.month).padStart(2, '0');
-        const d = String(item.date.day).padStart(2, '0');
-        return `${item.date.year}-${m}-${d}`;
-    }
-    const local = new Date(item.timestamp * MS_IN_SECOND);
-    const m = String(local.getMonth() + 1).padStart(2, '0');
-    const d = String(local.getDate()).padStart(2, '0');
-    return `${local.getFullYear()}-${m}-${d}`;
-}
 
 /** Daily traffic series of several interfaces, aligned by date and summed */
 export interface AggregateDailySeries {
@@ -116,13 +96,8 @@ export function useAggregateTrend() {
     /** It failed and there is no displayable data at all (the template shows the error state based on this) */
     const failed = computed(() => status.value === 'error' && series.value.keys.length === 0);
 
-    /** Generation of the current fetch: once a new refresh round starts, late results of the old one are discarded */
-    let epoch = 0;
-    let disposed = false;
-
-    onScopeDispose(() => {
-        disposed = true;
-    });
+    /** Guard against late results: once a new refresh round starts, the results of the old one are discarded */
+    const guard = useStaleGuard();
 
     /**
      * Fetch the details of all interfaces and rebuild the aggregate series.
@@ -132,11 +107,11 @@ export function useAggregateTrend() {
      */
     async function refresh(signal?: AbortSignal): Promise<void> {
         if (signal?.aborted) return;
-        const gen = ++epoch;
+        const isCurrent = guard.begin();
         if (status.value === 'idle') status.value = 'loading';
         try {
             const names = await getInterfaces();
-            if (signal?.aborted || disposed || gen !== epoch) return;
+            if (signal?.aborted || !isCurrent()) return;
             // A single failing interface does not bring down the whole thing: failing entries are
             // skipped, and an error is raised only when all of them fail
             const details = (
@@ -146,13 +121,13 @@ export function useAggregateTrend() {
                     ),
                 )
             ).filter((d): d is VnstatInterfaceDetail => d !== null);
-            if (signal?.aborted || disposed || gen !== epoch) return;
+            if (signal?.aborted || !isCurrent()) return;
             if (details.length === 0) throw new Error('no interface details');
             series.value = buildAggregateDailySeries(details);
             interfaceCount.value = details.length;
             status.value = 'ready';
         } catch (err) {
-            if (disposed || gen !== epoch) return;
+            if (!isCurrent()) return;
             if (err instanceof DOMException && err.name === 'AbortError') return;
             status.value = 'error';
         }

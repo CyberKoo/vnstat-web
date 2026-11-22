@@ -243,6 +243,12 @@ defineEmits<{
     }
 }
 
+@media (pointer: coarse) {
+    .s2-header-actions {
+        gap: 6px;
+    }
+}
+
 .s2-header-btn:hover:not(:disabled) {
     border-color: var(--s2-border, #d8dce8);
     background: var(--s2-hover-bg, rgba(28, 35, 51, 0.04));

@@ -2,8 +2,15 @@
 
 /**
  * Base API path (e.g. "/api/v1"), defaulted from the .env config or "/api/v1"
+ *
+ * The single source of truth for where the data API lives: the REST layer (src/api/request.ts)
+ * and the SSE client (src/composables/useLiveNetworkStats.ts) both read it from here, so the two
+ * can never disagree on the base path.
+ *
+ * The `||` fallback (not `??`) treats an empty string as "not configured", which is the same
+ * semantics the dev proxy uses in vite.config.ts.
  */
-export const API_BASE_URL: string = import.meta.env.VITE_APP_BASE_API ?? '/api/v1';
+export const API_BASE_URL: string = import.meta.env.VITE_APP_BASE_API || '/api/v1';
 
 /**
  * Maximum number of chart points, 60 by default

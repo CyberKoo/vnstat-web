@@ -377,7 +377,7 @@ function clearThreshold() {
 }
 
 .s2-tool-btn.active {
-    color: var(--danger);
+    color: var(--danger-text);
     border-color: var(--danger);
 }
 
@@ -461,7 +461,7 @@ function clearThreshold() {
 }
 
 .s2-thr-clear:hover:not(:disabled) {
-    color: var(--danger);
+    color: var(--danger-text);
     border-color: var(--danger);
 }
 
@@ -529,7 +529,7 @@ function clearThreshold() {
     border: 1px solid var(--brand);
     border-radius: var(--s2-radius-xs);
     background: transparent;
-    color: var(--brand);
+    color: var(--brand-text);
     font-size: 12px;
     font-family: var(--font-sans);
     cursor: pointer;
@@ -568,6 +568,11 @@ function clearThreshold() {
     outline: none;
     cursor: pointer;
     background: linear-gradient(90deg, var(--brand) var(--fill, 100%), var(--s2-border-light) var(--fill, 100%));
+}
+
+.s2-replay-slider:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
 }
 
 .s2-replay-slider::-webkit-slider-thumb {
@@ -654,7 +659,37 @@ function clearThreshold() {
     }
     .s2-replay-time {
         width: 84px;
-        font-size: 10px;
+        font-size: 11px;
+    }
+}
+
+@media (pointer: coarse) {
+    .s2-replay-slider {
+        height: 44px;
+        background: transparent;
+    }
+
+    .s2-replay-slider::-webkit-slider-runnable-track {
+        height: 4px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--brand) var(--fill, 100%), var(--s2-border-light) var(--fill, 100%));
+    }
+
+    .s2-replay-slider::-webkit-slider-thumb {
+        width: 20px;
+        height: 20px;
+        margin-top: -8px;
+    }
+
+    .s2-replay-slider::-moz-range-track {
+        height: 4px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--brand) var(--fill, 100%), var(--s2-border-light) var(--fill, 100%));
+    }
+
+    .s2-replay-slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
     }
 }
 </style>
